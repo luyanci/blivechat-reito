@@ -28,6 +28,9 @@ export default {
 
     openSpecificTutorial: '打开对应教程',
 
+    unavailableWhenUsingAuthCode: '已过时，使用身份码时不可用',
+    disabledByServer: '已被服务器禁用',
+
     general: '常规',
     room: '房间',
     roomId: '房间ID',
@@ -149,7 +152,9 @@ export default {
 
     advanced: '高级',
     relayMessagesByServer: '通过服务器转发消息',
-    autoTranslate: '自动翻译弹幕到日语（需要通过服务器转发消息）',
+    relayMessagesByServerTip: '开启时的消息路径：B站服务器 -> blivechat服务器 -> 你的浏览器。部分高级功能需要开启这个。推荐只在本地使用blivechat时开启，而通过远程服务器使用时不开启',
+    autoTranslate: '自动翻译弹幕到日语',
+    requiresRelayMessagesByServer: '需要通过服务器转发消息',
     giftUsernamePronunciation: '标注打赏用户名读音',
     dontShow: '不显示',
     pinyin: '拼音',
@@ -171,6 +176,7 @@ export default {
     emoticonFileTooLarge: '表情包文件太大',
 
     urlTooLong: '房间URL太长了，会被直播姬截断（OBS不会）',
+    roomUrlUpdated: '房间URL已更新，记得重新复制',
     roomUrl: '房间URL',
     customCss: '自定义CSS',
     cssFileTooLarge: 'CSS文件太大',

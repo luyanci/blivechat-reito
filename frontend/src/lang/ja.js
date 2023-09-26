@@ -16,7 +16,9 @@ export default {
     roomIdInteger: 'ルームは正の整数でなければなりません',
     authCodeEmpty: 'アイデンティティコードを空白にすることはできません',
     authCodeFormatError: 'アイデンティティコードの形式エラー',
-    useAuthCodeWarning: 'アイデンティティコードを優先的に使用してください',
+
+    unavailableWhenUsingAuthCode: '非推奨です。アイデンティティコードを使用する際に利用できません',
+    disabledByServer: 'サーバーによって無効にされました',
 
     logout: 'ログアウト',
     startLogin: 'ログインを開始',
@@ -27,6 +29,7 @@ export default {
     openSpecificTutorial: '使用教程',
 
     general: '常規',
+    useAuthCodeWarning: 'アイデンティティコードを優先的に使用してください',
     room: 'ルーム',
     roomId: 'ルームID',
     authCode: 'アイデンティティコード',
@@ -144,7 +147,9 @@ export default {
 
     advanced: 'アドバンスド',
     relayMessagesByServer: 'サーバを介してメッセージを転送する',
-    autoTranslate: 'コメントを日本語に翻訳する（サーバを介してメッセージを転送する必要）',
+    relayMessagesByServerTip: '有効になった場合のメッセージパス：Bilibiliサーバー -> blivechatサーバー -> あなたのブラウザー。一部の高度な機能では、これが有効になっている必要があります。blivechatをローカルで使用する場合にのみ有効にすることを推奨します。リモートサーバーを介して使用する場合には、有効にしないようにしてください',
+    autoTranslate: 'コメントを日本語に翻訳する',
+    requiresRelayMessagesByServer: 'サーバを介してメッセージを転送する必要',
     giftUsernamePronunciation: 'スーパーチャットのユーザー名の発音',
     dontShow: '非表示',
     pinyin: 'ピンイン',
@@ -167,6 +172,7 @@ export default {
     emoticonFileTooLarge: 'スタンプファイルが大きすぎます',
 
     urlTooLong: 'ルームのURLが長すぎて、直播姬によって切り詰められます（ただし、OBSでは切り詰められません）',
+    roomUrlUpdated: 'ルームのURLが更新されました。再度コピーすることをお忘れなく',
     roomUrl: 'ルームのURL',
     customCss: 'カスタムCSS',
     cssFileTooLarge: 'CSSファイルが大きすぎます',

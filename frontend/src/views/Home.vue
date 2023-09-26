@@ -441,32 +441,38 @@
                 </el-form-item>
               </el-col>
               <el-col :xs="24" :sm="8">
-                <el-form-item :title="$t('home.openSpecificTutorial')">
+                <el-tooltip :content="$t('home.unavailableWhenUsingAuthCode')">
+                  <el-form-item :title="$t('home.openSpecificTutorial')">
                   <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2#AtoJ3" target="_blank">
                     {{$t('home.informalUser')}}
                   </a>
-                  <el-switch v-model="form.blockNewbie"></el-switch>
-                </el-form-item>
+                    <el-switch v-model="form.blockNewbie"></el-switch>
+                  </el-form-item>
+                </el-tooltip>
               </el-col>
               <el-col :xs="24" :sm="8">
-                <el-form-item :title="$t('home.openSpecificTutorial')">
+                <el-tooltip :content="$t('home.unavailableWhenUsingAuthCode')">
+                  <el-form-item :title="$t('home.openSpecificTutorial')">
                   <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2#AtoJ3" target="_blank">
                     {{$t('home.unverifiedUser')}}
                   </a>
-                  <el-switch v-model="form.blockNotMobileVerified"></el-switch>
-                </el-form-item>
+                    <el-switch v-model="form.blockNotMobileVerified"></el-switch>
+                  </el-form-item>
+                </el-tooltip>
               </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :xs="24" :sm="12">
-                <el-form-item>
+                <el-tooltip :content="$t('home.unavailableWhenUsingAuthCode')">
+                  <el-form-item>
                   <span slot="label" :title="$t('home.openSpecificTutorial')">
                     <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2#AtoJ3" target="_blank">
                       {{$t('home.blockLevel')}}
                     </a>
                   </span>
-                  <el-slider v-model="form.blockLevel" show-input :min="0" :max="60"></el-slider>
-                </el-form-item>
+                    <el-slider v-model="form.blockLevel" show-input :min="0" :max="60"></el-slider>
+                  </el-form-item>
+                </el-tooltip>
               </el-col>
               <el-col :xs="24" :sm="12">
                 <el-form-item>
@@ -557,25 +563,33 @@
             <el-card shadow="never">
               <el-row :gutter="20">
                 <el-col :xs="24" :sm="8">
+                  <el-tooltip :content="$t('home.relayMessagesByServerTip')">
                   <el-form-item :title="$t('home.openSpecificTutorial')">
                     <span slot="label">
                       <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2#PUfUK" target="_blank">
                         {{$t('home.relayMessagesByServer')}}
                       </a>
                     </span>
-                    <el-switch v-model="form.relayMessagesByServer"></el-switch>
-                  </el-form-item>
-                </el-col>
+                      <el-switch v-model="form.relayMessagesByServer"></el-switch>
+                    </el-form-item>
+                  </el-tooltip>
+              </el-col>
                 <el-col :xs="24" :sm="8">
+                  <el-tooltip :content="$t('home.requiresRelayMessagesByServer')">
                   <el-form-item :title="$t('home.openSpecificTutorial')">
                     <span slot="label">
                       <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2#PUfUK" target="_blank">
                         {{$t('home.autoTranslate')}}
                       </a>
                     </span>
-                    <el-switch v-model="form.autoTranslate" :disabled="!serverConfig.enableTranslate || !form.relayMessagesByServer || form.mergeSameUserDanmaku"></el-switch>
+                      <el-tooltip :content="$t('home.disabledByServer')" placement="top" :disabled="serverConfig.enableTranslate">
+                      <el-switch v-model="form.autoTranslate"
+                        :disabled="!serverConfig.enableTranslate || !form.relayMessagesByServer || form.mergeSameUserDanmaku"
+                      ></el-switch>
+                      </el-tooltip>
                   </el-form-item>
-                </el-col>
+                  </el-tooltip>
+              </el-col>
               </el-row>
             </el-card>
             <el-form-item :title="$t('home.openSpecificTutorial')">
@@ -809,10 +823,12 @@
           <p v-if="obsRoomUrl.length > 1024">
             <el-alert :title="$t('home.urlTooLong')" type="warning" show-icon :closable="false"></el-alert>
           </p>
-          <el-form-item :label="$t('home.roomUrl')">
-            <el-input ref="roomUrlInput" readonly :value="obsRoomUrl" style="width: calc(100% - 8em); margin-right: 1em;"></el-input>
-            <el-button type="primary" icon="el-icon-copy-document" @click="copyUrl"></el-button>
-          </el-form-item>
+          <el-tooltip :content="$t('home.roomUrlUpdated')" v-model="showRoomUrlUpdatedTip" manual placement="top">
+            <el-form-item :label="$t('home.roomUrl')">
+              <el-input ref="roomUrlInput" readonly :value="obsRoomUrl" style="width: calc(100% - 8em); margin-right: 1em;"></el-input>
+              <el-button type="primary" icon="el-icon-copy-document" @click="copyUrl"></el-button>
+            </el-form-item>
+          </el-tooltip>
           <el-form-item :label="$t('home.customCss')">
             <el-input v-model="form.customCss" style="width: calc(100% - 16em); margin-right: 1em;"></el-input>
             <el-button-group>
@@ -930,6 +946,7 @@ export default {
       // 因为$refs.form.validate是异步的所以不能直接用计算属性
       // getUnvalidatedRoomUrl -> unvalidatedRoomUrl -> updateRoomUrl -> roomUrl
       roomUrl: '',
+      showRoomUrlUpdatedTip: false,
       login: {
         image: '',
         isLogin: false,
@@ -962,7 +979,15 @@ export default {
   },
   watch: {
     unvalidatedRoomUrl: 'updateRoomUrl',
-    roomUrl: _.debounce(function() {
+    roomUrl: _.debounce(function(val, oldVal) {
+      // 提示用户URL已更新
+      // 如果语言不是默认的中文，则刷新页面时也会有一次提示，没办法
+      if (val !== '' && oldVal !== '') {
+        this.showRoomUrlUpdatedTip = true
+        this.delayHideRoomUrlUpdatedTip()
+      }
+
+      // 保存配置
       window.localStorage.roomKeyType = this.form.roomKeyType
       window.localStorage.roomId = this.form.roomId
       window.localStorage.authCode = this.form.authCode
@@ -996,6 +1021,11 @@ export default {
       // 没有异步的校验规则，应该不需要考虑竞争条件
       this.roomUrl = this.unvalidatedRoomUrl
     },
+    
+    delayHideRoomUrlUpdatedTip: _.debounce(function() {
+      this.showRoomUrlUpdatedTip = false
+    }, 3000),
+
 
     enterBilibili() {
       window.open(`https://live.bilibili.com/${this.form.roomId}`, '_blank')
