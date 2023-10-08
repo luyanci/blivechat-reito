@@ -53,12 +53,13 @@ import _ from 'lodash'
 import general from './general'
 import Legacy from './Legacy'
 import LineLike from './LineLike'
-import Room from '@/views/Room'
 
 export default {
   name: 'StyleGenerator',
   components: {
-    general, Legacy, LineLike, Room
+    Legacy,
+    LineLike,
+    Room: () => import('@/views/Room'),
   },
   data() {
     let styleElement = document.createElement('style')

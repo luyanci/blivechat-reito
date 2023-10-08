@@ -25,10 +25,6 @@ import * as trie from '@/utils/trie'
 import * as pronunciation from '@/utils/pronunciation'
 import * as chatConfig from '@/api/chatConfig'
 import * as chat from '@/api/chat'
-import ChatClientTest from '@/api/chat/ChatClientTest'
-import ChatClientDirectWeb from '@/api/chat/ChatClientDirectWeb'
-import ChatClientDirectOpenLive from '@/api/chat/ChatClientDirectOpenLive'
-import ChatClientRelay from '@/api/chat/ChatClientRelay'
 import ChatRenderer from '@/components/ChatRenderer'
 import * as constants from '@/components/ChatRenderer/constants'
 import axios from 'axios'
@@ -181,14 +177,27 @@ export default {
       document.removeEventListener('visibilitychange', this.onVisibilityChange)
       this.init()
     },
-    init() {
+    async init() {
       this.initConfig()
-      this.initChatClient()
+
+      let initChatClientPromise = this.initChatClient()
       this.initTextEmoticons()
       if (this.config.giftUsernamePronunciation !== '') {
         this.pronunciationConverter = new pronunciation.PronunciationConverter()
         this.pronunciationConverter.loadDict(this.config.giftUsernamePronunciation)
       }
+
+      try {
+        await initChatClientPromise
+      } catch (e) {
+        this.$message.error({
+          message: `Failed to load: ${e}`,
+          duration: 10 * 1000
+        })
+        throw e
+      }
+
+
 
       // 在页面刷新缓存时, 读取用户emoticons.json, 并建立表情包库
       axios.get('/emoticons.json')
@@ -307,19 +316,23 @@ export default {
         return {}
       }
     },
-    initChatClient() {
+    async initChatClient() {
       if (this.roomKeyValue === null) {
-        this.chatClient = new ChatClientTest(this.config.minDanmakuInterval, this.config.maxDanmakuInterval)
+        let ChatClientTest = (await import('@/api/chat/ChatClientTest')).default
+        this.chatClient = new ChatClientTest()
       } else if (this.config.relayMessagesByServer) {
         let roomKey = {
           type: this.roomKeyType,
           value: this.roomKeyValue
         }
+        let ChatClientRelay = (await import('@/api/chat/ChatClientRelay')).default
         this.chatClient = new ChatClientRelay(roomKey, this.config.autoTranslate)
       } else {
         if (this.roomKeyType === 1) {
+          let ChatClientDirectWeb = (await import('@/api/chat/ChatClientDirectWeb')).default
           this.chatClient = new ChatClientDirectWeb(this.roomKeyValue)
         } else {
+          let ChatClientDirectOpenLive = (await import('@/api/chat/ChatClientDirectOpenLive')).default
           this.chatClient = new ChatClientDirectOpenLive(this.roomKeyValue)
         }
       }
