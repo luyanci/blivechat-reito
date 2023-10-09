@@ -433,6 +433,9 @@ export default class ChatClientTest {
     } else {
       sleepTime = randInt(0, 400)
     }
+    if (this.timerId) {
+      window.clearTimeout(this.timerId)
+    }
     this.timerId = window.setTimeout(this.onTimeout.bind(this), sleepTime)
   }
 

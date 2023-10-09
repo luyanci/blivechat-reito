@@ -53,13 +53,22 @@ export default {
     // },
   },
   data() {
+    let customStyleElement = document.createElement('style')
+    document.head.appendChild(customStyleElement)
     return {
       config: chatConfig.deepCloneDefaultConfig(),
+
       chatClient: null,
+      textEmoticons: [], // 官方的文本表情（后端配置的）
       pronunciationConverter: null,
+<<<<<<< HEAD
       danmu_pic_json: [],
       textEmoticons: [], // 官方的文本表情
       uidColorMap: {},
+=======
+
+      customStyleElement, // 仅用于样式生成器中预览样式
+>>>>>>> fd1518d (样式生成器预览放到iframe，防止影响到外面网页)
     }
   },
   computed: {
@@ -142,12 +151,18 @@ export default {
       // 当前窗口不可见，延迟到可见时加载，防止OBS中一次并发太多请求（OBS中浏览器不可见时也会加载网页，除非显式设置）
       document.addEventListener('visibilitychange', this.onVisibilityChange)
     }
+
+    window.addEventListener('message', this.onWindowMessage)
   },
   beforeDestroy() {
+    window.removeEventListener('message', this.onWindowMessage)
+
     document.removeEventListener('visibilitychange', this.onVisibilityChange)
     if (this.chatClient) {
       this.chatClient.stop()
     }
+
+    document.head.removeChild(this.customStyleElement)
   },
   methods: {
     setCustomCss() {
@@ -188,6 +203,7 @@ export default {
       }
 
       try {
+        // 其他初始化就不用等了，就算失败了也不会有很大影响
         await initChatClientPromise
       } catch (e) {
         this.$message.error({
@@ -351,11 +367,29 @@ export default {
       }
     },
 
-    start() {
-      this.chatClient.start()
-    },
-    stop() {
-      this.chatClient.stop()
+    // 处理样式生成器发送的消息
+    onWindowMessage(event) {
+      if (event.origin !== window.location.origin) {
+        console.warn(`消息origin错误，${event.origin} != ${window.location.origin}`)
+        return
+      }
+
+      let { type, data } = event.data
+      switch (type) {
+      case 'roomSetCustomStyle':
+        this.customStyleElement.innerText = data.css
+        break
+      case 'roomStartClient':
+        if (this.chatClient) {
+          this.chatClient.start()
+        }
+        break
+      case 'roomStopClient':
+        if (this.chatClient) {
+          this.chatClient.stop()
+        }
+        break
+      }
     },
 
     onInteractWord(data) {
