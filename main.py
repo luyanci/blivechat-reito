@@ -21,6 +21,7 @@ import config
 import models.database
 import services.avatar
 import services.chat
+import services.open_live
 import services.translate
 import update
 import utils.request
@@ -64,6 +65,7 @@ def init():
 
     services.avatar.init()
     services.translate.init()
+    services.open_live.init()
     services.chat.init()
 
     update.check_update()
