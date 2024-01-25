@@ -17,6 +17,7 @@ import aiohttp
 import cachetools
 
 import config
+import utils.async_io
 import utils.request
 
 logger = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ def init():
     _translate_cache = cachetools.LRUCache(cfg.translation_cache_size)
     # 总队列长度会超过translate_max_queue_size，不用这么严格
     _task_queues = [asyncio.Queue(cfg.translate_max_queue_size) for _ in range(len(Priority))]
-    asyncio.get_running_loop().create_task(_do_init())
+    utils.async_io.create_task_with_ref(_do_init())
 
 
 async def _do_init():
@@ -228,7 +229,7 @@ class TranslateProvider:
         self._be_available_event.set()
 
     async def init(self):
-        asyncio.create_task(self._translate_consumer())
+        utils.async_io.create_task_with_ref(self._translate_consumer())
         return True
 
     @property

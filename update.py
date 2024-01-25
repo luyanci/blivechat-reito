@@ -3,6 +3,7 @@ import asyncio
 
 import aiohttp
 
+import utils.async_io
 import utils.request
 
 VERSION = 'v1.8.2'
@@ -10,7 +11,7 @@ DOODLEBEAR_VERSION = 'v1.8.2-230924'
 
 def check_update():
     pass
-    #asyncio.get_running_loop().create_task(_do_check_update())
+    #async_io.create_task_with_ref(_do_check_update())
 
 
 async def _do_check_update():
