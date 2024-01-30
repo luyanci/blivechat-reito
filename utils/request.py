@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import shelve
+import asyncio
 from typing import *
 
 import aiohttp
@@ -17,8 +18,12 @@ logger = logging.getLogger(__name__)
 
 def init():
     global http_session
-    http_session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10))
+    http_session = aiohttp.ClientSession(
+        response_class=CustomClientResponse,
+        timeout=aiohttp.ClientTimeout(total=10)
+    )
     reload_cookie()
+
 
 
 async def shut_down():
@@ -35,3 +40,11 @@ def reload_cookie():
         else:
             logger.info('当前无登录态')
             http_session.cookie_jar.clear()
+            
+class CustomClientResponse(aiohttp.ClientResponse):
+    # 因为aiohttp的BUG，当底层连接断开时，_wait_released可能会抛出CancelledError，导致上层协程结束。这里改个错误类型
+    async def _wait_released(self):
+        try:
+            return await super()._wait_released()
+        except asyncio.CancelledError as e:
+            raise aiohttp.ClientConnectionError('Connection released') from e
