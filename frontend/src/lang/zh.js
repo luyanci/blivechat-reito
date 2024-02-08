@@ -2,9 +2,13 @@ export default {
   sidebar: {
     home: '首页',
     stylegen: '样式生成器',
-    help: '使用教程/帮助',
+    help: '帮助',
+    links: '常用链接',
     projectAddress: '项目地址',
-    giftRecordOfficial: '官方打赏记录',
+    discussion: '反馈 / 交流',
+    documentation: '文档',
+    mall: 'B站商店',
+    giftRecordOfficial: '打赏记录',
   },
   home: {
     roomIdEmpty: '房间ID不能为空',

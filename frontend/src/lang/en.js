@@ -2,9 +2,13 @@ export default {
   sidebar: {
     home: 'Home',
     stylegen: 'Style Generator',
-    help: 'Tutorial(Help)',
+    help: 'Help',
+    links: 'Links',
     projectAddress: 'Project Address',
-    giftRecordOfficial: 'Official Super Chat Record',
+    discussion: 'Discussions',
+    documentation: 'Documentation',
+    mall: 'Mall',
+    giftRecordOfficial: 'Super Chat Records',
   },
   home: {
     roomIdEmpty: "Room ID can't be empty",

@@ -2,9 +2,13 @@ export default {
   sidebar: {
     home: 'トップページ',
     stylegen: 'スタイルジェネレータ',
-    help: '使用教程（ヘルプ）',
+    help: 'ヘルプ',
+    links: 'リンク',
     projectAddress: 'プロジェクトアドレス',
-    giftRecordOfficial: '公式スーパーチャット記録',
+    discussion: '議論',
+    documentation: 'ドキュメンテーション',
+    mall: 'モール',
+    giftRecordOfficial: 'スーパーチャット記録',
   },
   home: {
     roomIdEmpty: 'ルームのIDを空白にすることはできません',
