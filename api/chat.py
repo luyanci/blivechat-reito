@@ -72,7 +72,8 @@ def make_text_message_data(
     translation: str = '',
     content_type: int = ContentType.TEXT,
     content_type_params: list = None,
-    uid: int = 0
+    uid: str = '',
+    medal_name: str = '',
 ):
     # 为了节省带宽用list而不是dict
     return [
@@ -378,6 +379,7 @@ class RoomInfoHandler(api.base.ApiHandler):
 
 class AvatarHandler(api.base.ApiHandler):
     async def get(self):
+        # uid基本是0了，现在这个接口唯一的作用是算用户名MD5，其实可以放到前端
         uid = int(self.get_query_argument('uid'))
         username = self.get_query_argument('username', '')
         dm_v2 = self.get_query_argument('dm_v2', None)
@@ -396,11 +398,10 @@ class AvatarHandler(api.base.ApiHandler):
         avatar_url = await services.avatar.get_avatar_url_or_none(uid)
         if avatar_url is None:
             avatar_url = services.avatar.get_default_avatar_url(uid, username)
-            # 缓存3分钟
-            self.set_header('Cache-Control', 'private, max-age=180')
+            cache_time = 86400 if uid == 0 else 180
         else:
-            # 缓存1天
-            self.set_header('Cache-Control', 'private, max-age=86400')
+            cache_time = 86400
+        self.set_header('Cache-Control', f'private, max-age={cache_time}')
         self.write({'avatarUrl': avatar_url})
 
 

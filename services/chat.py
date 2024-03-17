@@ -462,7 +462,8 @@ class LiveMsgHandler(blivedm.BaseHandler):
             translation=translation,
             content_type=content_type,
             content_type_params=content_type_params,
-            uid=message.uid
+            # 给插件用的字段
+            uid=str(message.uid) if message.uid != 0 else message.uname,
         ))
 
         if need_translate:
@@ -488,7 +489,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             'totalCoin': message.total_coin,
             'giftName': message.gift_name,
             'num': message.num,
-            'uid': message.uid
+            'uid': str(message.uid) if message.uid != 0 else message.uname
         })
 
     def _on_buy_guard(self, client: WebLiveClient, message: dm_web_models.GuardBuyMessage):
@@ -509,7 +510,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             'timestamp': message.start_time,
             'authorName': message.username,
             'privilegeType': message.guard_level,
-            'uid': message.uid
+            'uid': str(message.uid) if message.uid != 0 else message.username
         })
 
     def _on_super_chat(self, client: WebLiveClient, message: dm_web_models.SuperChatMessage):
@@ -540,8 +541,9 @@ class LiveMsgHandler(blivedm.BaseHandler):
             'price': message.price,
             'content': message.message,
             'translation': translation,
-            'uid': message.uid
+            'uid': str(message.uid) if message.uid != 0 else message.uname
         })
+
 
         if need_translate:
             utils.async_io.create_task_with_ref(self._translate_and_response(
@@ -591,14 +593,11 @@ class LiveMsgHandler(blivedm.BaseHandler):
     #
 
     def _on_open_live_danmaku(self, client: OpenLiveClient, message: dm_open_models.DanmakuMessage):
-        avatar_url = message.uface
-        services.avatar.update_avatar_cache_if_expired(message.uid, avatar_url)
-
         room = client_room_manager.get_room(client.room_key)
         if room is None:
             return
 
-        if message.uid == client.room_owner_uid:
+        if message.open_id == client.room_owner_open_id:
             author_type = 3  # 主播
         elif message.guard_level != 0:  # 1总督，2提督，3舰长
             author_type = 1  # 舰队
@@ -625,8 +624,8 @@ class LiveMsgHandler(blivedm.BaseHandler):
         else:
             translation = ''
 
-        room.send_cmd_data(api.chat.Command.ADD_TEXT, api.chat.make_text_message_data(
-            avatar_url=avatar_url,
+        data = api.chat.make_text_message_data(
+            avatar_url=services.avatar.process_avatar_url(message.uface),
             timestamp=message.timestamp,
             author_name=message.uname,
             author_type=author_type,
@@ -637,8 +636,8 @@ class LiveMsgHandler(blivedm.BaseHandler):
             translation=translation,
             content_type=content_type,
             content_type_params=content_type_params,
-            uid=message.uid
-        ))
+            uid=message.open_id
+        )
 
         if need_translate:
             utils.async_io.create_task_with_ref(self._translate_and_response(
@@ -659,36 +658,32 @@ class LiveMsgHandler(blivedm.BaseHandler):
 
         room.send_cmd_data(api.chat.Command.ADD_GIFT, {
             'id': message.msg_id,
-            'avatarUrl': avatar_url,
+            'avatarUrl': services.avatar.process_avatar_url(message.uface),
             'timestamp': message.timestamp,
             'authorName': message.uname,
             'totalCoin': message.price * message.gift_num,
             'giftName': message.gift_name,
             'num': message.gift_num,
-            'uid': message.uid
+            'uid': message.open_uid
         })
 
-    def _on_open_live_buy_guard(self, client: OpenLiveClient, message: dm_open_models.GuardBuyMessage):
-        avatar_url = message.user_info.uface
-        services.avatar.update_avatar_cache_if_expired(message.user_info.uid, avatar_url)
 
+    def _on_open_live_buy_guard(self, client: OpenLiveClient, message: dm_open_models.GuardBuyMessage):
         room = client_room_manager.get_room(client.room_key)
         if room is None:
             return
 
         room.send_cmd_data(api.chat.Command.ADD_MEMBER, {
             'id': message.msg_id,
-            'avatarUrl': avatar_url,
+            'avatarUrl': services.avatar.process_avatar_url(message.user_info.uface),
             'timestamp': message.timestamp,
             'authorName': message.user_info.uname,
             'privilegeType': message.guard_level,
-            'uid': message.user_info.uid
+            'uid': message.user_info.open_id
         })
 
-    def _on_open_live_super_chat(self, client: OpenLiveClient, message: dm_open_models.SuperChatMessage):
-        avatar_url = services.avatar.process_avatar_url(message.uface)
-        services.avatar.update_avatar_cache_if_expired(message.uid, avatar_url)
 
+    def _on_open_live_super_chat(self, client: OpenLiveClient, message: dm_open_models.SuperChatMessage):
         room = client_room_manager.get_room(client.room_key)
         if room is None:
             return
@@ -707,13 +702,13 @@ class LiveMsgHandler(blivedm.BaseHandler):
         msg_id = str(message.message_id)
         room.send_cmd_data(api.chat.Command.ADD_SUPER_CHAT, {
             'id': msg_id,
-            'avatarUrl': avatar_url,
+            'avatarUrl': services.avatar.process_avatar_url(message.uface),
             'timestamp': message.start_time,
             'authorName': message.uname,
             'price': message.rmb,
             'content': message.message,
             'translation': translation,
-            'uid': message.uid
+            'uid': message.open_id
         })
 
         if need_translate:
