@@ -52,6 +52,7 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
   async sendAuth() {
     const authParam = (await axios.get('/api/login/auth', { params: {
       room_id: this.roomId
+      // TODO B站开始检查key了，有空时加上
     } })).data
     this.websocket.send(this.makePacket(authParam, base.OP_AUTH))
   }
