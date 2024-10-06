@@ -8,7 +8,7 @@
           <h1 class="sidebar-title">blivechat</h1>
         </router-link>
       </div>
-      <div class="version">{{ APP_VERSION }}</div>
+      <div class="version">{{ APP_VERSION + ' - Community Kuma DOM' }}</div>
       <sidebar></sidebar>
     </el-aside>
     <el-main>
