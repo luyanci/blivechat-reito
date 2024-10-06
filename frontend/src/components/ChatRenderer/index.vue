@@ -18,6 +18,7 @@
                 :authorType="message.authorType"
                 :privilegeType="message.privilegeType"
                 :richContent="getShowRichContent(message)"
+                :medalLevel="message.medalLevel"
                 :repeated="message.repeated"
               ></text-message>
               <paid-message :key="message.id" v-else-if="message.type === MESSAGE_TYPE_GIFT"
@@ -26,7 +27,6 @@
                 :avatarUrl="message.avatarUrl"
                 :authorName="getShowAuthorName(message)"
                 :price="message.price"
-                :priceText="message.price <= 0 ? getGiftShowNameAndNum(message) : ''"
                 :content="message.price <= 0 ? '' : getGiftShowContent(message)"
               ></paid-message>
               <membership-item :key="message.id" v-else-if="message.type === MESSAGE_TYPE_MEMBER"

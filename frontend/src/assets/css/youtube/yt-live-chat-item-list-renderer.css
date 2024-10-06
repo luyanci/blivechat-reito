@@ -94,13 +94,13 @@ yt-live-chat-item-list-renderer[allow-scroll] #item-scroller.yt-live-chat-item-l
   padding-right: 0;
 }
 
-#item-offset.yt-live-chat-item-list-renderer {
+/* #item-offset.yt-live-chat-item-list-renderer {
   position: relative;
-}
+} */
 
-#item-scroller.animated.yt-live-chat-item-list-renderer #item-offset.yt-live-chat-item-list-renderer {
+/* #item-scroller.animated.yt-live-chat-item-list-renderer #item-offset.yt-live-chat-item-list-renderer {
   overflow: hidden;
-}
+} */
 
 #items.yt-live-chat-item-list-renderer {
   -ms-flex: 1 1 0.000000001px;
@@ -137,4 +137,109 @@ yt-live-chat-paid-sticker-renderer.yt-live-chat-item-list-renderer {
 
 yt-live-chat-paid-sticker-renderer.yt-live-chat-item-list-renderer[dashboard-money-feed] {
   padding: 8px 16px;
+}
+
+#item-offset.yt-live-chat-item-list-renderer.collapsing {
+  transition: height 0.2s ease-in-out;
+  /* transition: none; */
+}
+/* TODO: 弹幕消失，移除弹幕动画设定 */
+yt-live-chat-interact-message-renderer.leaving,
+yt-live-chat-text-message-renderer.leaving,
+yt-live-chat-membership-item-renderer.leaving,
+yt-live-chat-paid-message-renderer.leaving {
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+}
+
+yt-live-chat-interact-message-renderer.collapsing,
+yt-live-chat-text-message-renderer.collapsing,
+yt-live-chat-membership-item-renderer.collapsing,
+yt-live-chat-paid-message-renderer.collapsing {
+  transition: height 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* TODO: 弹幕随机位置设定 */
+yt-live-chat-interact-message-renderer[randomXOffset],
+yt-live-chat-text-message-renderer[randomXOffset],
+yt-live-chat-membership-item-renderer[randomXOffset],
+yt-live-chat-paid-message-renderer[randomXOffset] {
+  position: absolute;
+  animation-name: anim_message_float_up;
+  animation-timing-function: linear;
+  animation-duration: var(--float-time);
+  animation-iteration-count: 1;
+  animation-delay: 0s;
+  animation-fill-mode: forwards;
+}
+@keyframes anim_message_float_up {
+  0% { 
+    transform: translate(var(--x-offset), var(--y-offset))
+  }
+  99% { 
+    transform: translate(var(--x-offset), calc(var(--y-offset) + var(--float-distance-y))); 
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(var(--x-offset), calc(var(--y-offset) + var(--float-distance-y))); 
+    opacity: 0; 
+  }
+}
+
+yt-live-chat-interact-message-renderer[randomYOffset],
+yt-live-chat-text-message-renderer[randomYOffset],
+yt-live-chat-membership-item-renderer[randomYOffset],
+yt-live-chat-paid-message-renderer[randomYOffset] {
+  position: absolute;
+  animation-name: anim_message_float_right;
+  animation-timing-function: linear;
+  animation-duration: var(--float-time);
+  animation-iteration-count: 1;
+  animation-delay: 0s;
+  animation-fill-mode: forwards;
+}
+@keyframes anim_message_float_right {
+  0% { 
+    transform: translate(var(--x-offset), calc(var(--y-offset))) 
+  }
+  99% { 
+    transform: translate(calc(var(--x-offset) + var(--float-distance-x)), calc(var(--y-offset)));
+    opacity: 1;
+  }
+  100% { 
+    transform: translate(calc(var(--x-offset) + var(--float-distance-x)), calc(var(--y-offset)));
+    opacity: 0;
+  }
+}
+
+yt-live-chat-interact-message-renderer[randomXOffset][randomYOffset],
+yt-live-chat-text-message-renderer[randomXOffset][randomYOffset],
+yt-live-chat-membership-item-renderer[randomXOffset][randomYOffset],
+yt-live-chat-paid-message-renderer[randomXOffset][randomYOffset] {
+  perspective: 500px;
+  animation-name: anim_message_float;
+  animation-timing-function: ease-in-out;
+  animation-duration: var(--float-time);
+  animation-iteration-count: 1;
+  animation-delay: 0s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes anim_message_float {
+  0% { 
+    transform: translate(var(--x-offset), var(--y-offset)) scale(0.8, 0.8); 
+    opacity: 0; 
+  }
+  2% { 
+    transform: translate(var(--x-offset), var(--y-offset)) scale(1, 1);
+    opacity: 1; 
+  }
+  98% {
+    transform: translate(calc(var(--x-offset) + var(--float-distance-x)), calc(var(--y-offset) + var(--float-distance-y))) scale(1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--x-offset) + var(--float-distance-x)), calc(var(--y-offset) + var(--float-distance-y))) scale(1, 1);
+    opacity: 0;
+  }
 }

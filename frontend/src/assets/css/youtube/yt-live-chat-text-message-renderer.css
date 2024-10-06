@@ -19,7 +19,7 @@ canvas.yt-live-chat-text-message-renderer, caption.yt-live-chat-text-message-ren
 #author-photo.yt-live-chat-text-message-renderer {
   display: block;
   margin-right: 16px;
-  overflow: hidden;
+  /* overflow: hidden; */
   border-radius: 50%;
   -ms-flex: none;
   -webkit-flex: none;
@@ -114,7 +114,7 @@ yt-live-chat-text-message-renderer[has-inline-action-buttons]:hover #menu.yt-liv
 
 yt-live-chat-text-message-renderer {
   position: relative;
-  font-size: 13px;
+  font-size: 16px;
   padding: 4px 24px;
   overflow: hidden;
   --yt-endpoint-color: var(--yt-live-chat-primary-text-color, hsl(0, 0%, 6.7%));
@@ -136,7 +136,14 @@ yt-live-chat-text-message-renderer[author-is-owner] {
   background-color: var(--yt-live-chat-message-highlight-background-color);
 }
 
+#card.yt-live-chat-text-message-renderer {
+  display: flex;
+  flex-direction: row !important;
+}
+
 #content.yt-live-chat-text-message-renderer {
+  display: inline;
+  align-items: flex-start;
   -ms-align-self: center;
   -webkit-align-self: center;
   align-self: center;
@@ -147,9 +154,10 @@ yt-live-chat-author-chip.yt-live-chat-text-message-renderer {
   margin-right: 8px;
 }
 
-#message.yt-live-chat-text-message-renderer {
+#image-and-message #message.yt-live-chat-text-message-renderer {
   color: var(--yt-live-chat-primary-text-color, var(--yt-primary-text-color));
-  line-height: 16px;
+  /* display: inline; */
+  width: fit-content;
   overflow: hidden;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -158,13 +166,28 @@ yt-live-chat-author-chip.yt-live-chat-text-message-renderer {
   opacity: var(--yt-live-chat-text-message-renderer-message-message-style_-_opacity);
 }
 
-#message.yt-live-chat-text-message-renderer .emoji.yt-live-chat-text-message-renderer {
+#image-and-message img[display="block"] {
+  margin-top: 3px;
+}
+#image-and-message img[display="inline"] {
+  position: relative;
+  top: 3px;
+}
+
+yt-live-chat-text-message-renderer #image-and-message .emoji {
   /* B站表情有不是正方形的 */
-  /* width: var(--yt-live-chat-emoji-size); */
   width: auto;
   height: var(--yt-live-chat-emoji-size);
   margin: -1px 2px 1px 2px;
   vertical-align: middle;
+}
+
+yt-live-chat-text-message-renderer #image-and-message .emoji[id^=official] {
+  height: 32px;
+}
+yt-live-chat-text-message-renderer #image-and-message .emoji[id^=upower],
+yt-live-chat-text-message-renderer #image-and-message .emoji[id^=room] {
+  height: 64px;
 }
 
 a.yt-live-chat-text-message-renderer {
@@ -172,13 +195,13 @@ a.yt-live-chat-text-message-renderer {
   text-decoration: underline;
 }
 
-#message.yt-live-chat-text-message-renderer a.yt-live-chat-text-message-renderer {
+#image-and-message.yt-live-chat-text-message-renderer a.yt-live-chat-text-message-renderer {
   display: inline;
   text-decoration: underline;
   word-break: break-all;
 }
 
-#message.yt-live-chat-text-message-renderer a.yt-live-chat-text-message-renderer .mention.yt-live-chat-text-message-renderer {
+#image-and-message.yt-live-chat-text-message-renderer a.yt-live-chat-text-message-renderer .mention.yt-live-chat-text-message-renderer {
   text-decoration: underline;
 }
 
@@ -186,7 +209,7 @@ a.yt-live-chat-text-message-renderer {
   margin-left: 2px;
 }
 
-#message.yt-live-chat-text-message-renderer:empty, #deleted-state.yt-live-chat-text-message-renderer:empty, #show-original.yt-live-chat-text-message-renderer:empty, yt-live-chat-text-message-renderer[show-original] #deleted-state.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[show-original] #show-original.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[is-deleted]:not([show-original]) #message.yt-live-chat-text-message-renderer {
+#image-and-message.yt-live-chat-text-message-renderer:empty, #deleted-state.yt-live-chat-text-message-renderer:empty, #show-original.yt-live-chat-text-message-renderer:empty, yt-live-chat-text-message-renderer[show-original] #deleted-state.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[show-original] #show-original.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[is-deleted]:not([show-original]) #image-and-message.yt-live-chat-text-message-renderer {
   display: none;
 }
 
@@ -202,7 +225,7 @@ a.yt-live-chat-text-message-renderer {
   border-radius: 2px;
 }
 
-#deleted-state.yt-live-chat-text-message-renderer, #show-original.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[is-deleted] #message.yt-live-chat-text-message-renderer {
+#deleted-state.yt-live-chat-text-message-renderer, #show-original.yt-live-chat-text-message-renderer, yt-live-chat-text-message-renderer[is-deleted] #image-and-message.yt-live-chat-text-message-renderer {
   font-style: italic;
   color: var(--yt-live-chat-deleted-message-color, rgba(0, 0, 0, 0.5));
 }
@@ -223,10 +246,27 @@ yt-live-chat-text-message-renderer[is-deleted]::before {
   background: var(--yt-live-chat-deleted-message-bar-color, rgba(0, 0, 0, 0.5));
 }
 
-yt-live-chat-text-message-renderer[is-dimmed] #message.yt-live-chat-text-message-renderer {
+yt-live-chat-text-message-renderer[is-dimmed] #image-and-message.yt-live-chat-text-message-renderer {
   opacity: 0.25;
 }
 
 yt-live-chat-text-message-renderer[is-dimmed]::before {
   background: var(--yt-live-chat-error-message-color, #f44336);
+}
+
+#thread {
+  width: 100%;
+}
+
+/** block 的消失动画 */
+yt-live-chat-text-message-renderer[is-deleted] {
+  animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  animation: anim_bottom_up_fade_out 600ms;
+  animation-fill-mode: forwards;
+}
+
+/** 从下往上升起 + 淡出动画 */
+@keyframes anim_bottom_up_fade_out {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-18px); display: none;}
 }
