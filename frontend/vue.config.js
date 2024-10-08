@@ -1,7 +1,16 @@
+const { defineConfig } = require('@vue/cli-service')
+
 // 不能用localhost，https://forum.dfinity.org/t/development-workflow-quickly-test-code-modifications/1793/21
 const API_BASE_URL = 'http://127.0.0.1:12450'
 
-module.exports = {
+function toBool(val) {
+  if (typeof val === 'string') {
+    return ['false', 'no', 'off', '0', ''].indexOf(val.toLowerCase()) === -1
+  }
+  return Boolean(val)
+}
+
+module.exports = defineConfig({
   devServer: {
     proxy: {
       '/api': {
@@ -13,8 +22,10 @@ module.exports = {
       }
     }
   },
+  productionSourceMap: toBool(process.env.PROD_SOURCE_MAP),
   chainWebpack: config => {
     const APP_VERSION = `v${process.env.npm_package_version}`
+    const LIB_USE_CDN = toBool(process.env.LIB_USE_CDN)
 
     const ENV = {
       APP_VERSION,
@@ -31,7 +42,7 @@ module.exports = {
         return args
       })
 
-    if (ENV.LIB_USE_CDN) {
+    if (LIB_USE_CDN) {
       config.externals({
         'element-ui': 'ELEMENT',
         lodash: '_',
@@ -42,4 +53,4 @@ module.exports = {
       })
     }
   }
-}
+})
