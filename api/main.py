@@ -52,6 +52,14 @@ class ServerInfoHandler(api.base.ApiHandler):
         })
 
 
+class ServiceDiscoveryHandler(api.base.ApiHandler):
+    async def get(self):
+        cfg = config.get_config()
+        self.write({
+            'endpoints': cfg.registered_endpoints,
+        })
+
+
 class UploadEmoticonHandler(api.base.ApiHandler):
     async def post(self):
         cfg = config.get_config()
@@ -123,6 +131,7 @@ class UploadCSSHandler(api.base.ApiHandler):
 
 ROUTES = [
     (r'/api/server_info', ServerInfoHandler),
+    (r'/api/endpoints', ServiceDiscoveryHandler),
     (r'/api/emoticon', UploadEmoticonHandler),
     (r'/api/custom_css', UploadCSSHandler),
 ]
