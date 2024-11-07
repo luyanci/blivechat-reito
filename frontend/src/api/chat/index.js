@@ -1,7 +1,16 @@
-import axios from 'axios'
 import MD5 from 'crypto-js/md5'
 
-export const FATAL_ERROR_TYPE_AUTH_CODE_ERROR = 1
+import { apiClient as axios } from '@/api/base'
+
+export function getDefaultMsgHandler() {
+  let dummyFunc = () => {}
+  return {
+    onAddText: dummyFunc,
+    onAddGift: dummyFunc,
+    onAddMember: dummyFunc,
+    onAddSuperChat: dummyFunc,
+    onDelSuperChat: dummyFunc,
+    onUpdateTranslation: dummyFunc,
 
 export class ChatClientFatalError extends Error {
   constructor(type, message) {

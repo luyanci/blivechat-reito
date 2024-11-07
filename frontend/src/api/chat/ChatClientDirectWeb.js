@@ -1,6 +1,4 @@
-import axios from 'axios'
-
-import { getUuid4Hex } from '@/utils'
+import { apiClient as axios } from '@/api/base'
 import * as chat from '.'
 import * as base from './ChatClientOfficialBase'
 import ChatClientOfficialBase from './ChatClientOfficialBase'
