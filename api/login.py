@@ -29,6 +29,8 @@ import base64
 
 logger = logging.getLogger(__name__)
 
+header={'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36','Content-type':'application/json'}
+
 class StatusHandler(api.base.ApiHandler):  # noqa
     async def get(self):
         with shelve.open('data/login') as db:
@@ -55,8 +57,9 @@ class KillHandler(api.base.ApiHandler):  # noqa
 
 class StartHandler(api.base.ApiHandler):  # noqa
     async def get(self):  
-        async with ClientSession(cookies={'appkey': 'aae92bc66f3edfab'}) as session:
-            res = await session.get('https://passport.bilibili.com/x/passport-login/web/qrcode/generate', params={'source': 'live_pc'})
+        async with ClientSession(cookies={'appkey': 'aae92bc66f3edfab'},headers=header) as session:
+            res = await session.get('https://passport.bilibili.com/x/passport-login/web/qrcode/generate')
+            print(res.text)
             data = await res.json()
             login_url = data['data']['url']
             qrcode_key = data['data']['qrcode_key']
@@ -77,10 +80,10 @@ class StartHandler(api.base.ApiHandler):  # noqa
 
 class CheckHandler(api.base.ApiHandler):  # noqa
     async def get(self):
-        async with ClientSession(cookies={'appkey': 'aae92bc66f3edfab'}) as session:
+        async with ClientSession(cookies={'appkey': 'aae92bc66f3edfab'},headers=header) as session:
             qrcode_key = self.get_query_argument('qrcode_key')  
             
-            res = await session.get('https://passport.bilibili.com/x/passport-login/web/qrcode/poll', params={'qrcode_key': qrcode_key})
+            res = await session.get('https://passport.bilibili.com/x/passport-login/web/qrcode/poll',params={'qrcode_key':qrcode_key})
             data = await res.json()
             
             state = data['data']['code'] 
@@ -89,6 +92,7 @@ class CheckHandler(api.base.ApiHandler):  # noqa
                 cookies = session.cookie_jar.filter_cookies('https://bilibili.com')
                 with shelve.open('data/login') as db:
                     db['cookie'] = cookies
+                    print(cookies)
                     db['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 utils.request.reload_cookie()
                 self.write({
@@ -99,7 +103,7 @@ class CheckHandler(api.base.ApiHandler):  # noqa
                     'ok': False,
                 })
 
-
+GET_BUVID3_URL='https://api.bilibili.com/x/frontend/finger/spi'
 ROOM_INIT_URL = 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom'
 DANMAKU_SERVER_CONF_URL = 'https://api.live.bilibili.com/xlive/web-room/v1/index/getDanmuInfo'
  
@@ -113,7 +117,7 @@ class AuthHandler(api.base.ApiHandler):  # noqa
             with shelve.open('data/login') as db:
                 cookie = db.get('cookie')
              
-            async with ClientSession() as session:
+            async with ClientSession(headers=header) as session:
                 res = await session.get(ROOM_INIT_URL, params={'room_id': room_id})
                 if res.status != 200:
                     logger.warning('room=%d getInfoByRoom() failed, status=%d, reason=%s', room_id,
@@ -158,7 +162,10 @@ class AuthHandler(api.base.ApiHandler):  # noqa
                     return    
                 else:
                     user_id = cookie['DedeUserID'].value
-                    buvid = cookie['buvid3'].value
+                    #buvid = cookie['buvid3'].value
+                    buvid_request=await session.get(GET_BUVID3_URL,headers=header)
+                    buvid_data = await buvid_request.json()
+                    buvid= buvid_data['data']['b_3']
                     self.write({
                         'uid': int(user_id),
                         'roomid': room_id,
