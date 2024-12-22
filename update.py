@@ -9,7 +9,8 @@ VERSION = 'v1.8.2'
 DOODLEBEAR_VERSION = 'v1.8.2-230924'
 
 def check_update():
-    asyncio.get_running_loop().create_task(_do_check_update())
+    pass
+    #asyncio.get_running_loop().create_task(_do_check_update())
 
 
 async def _do_check_update():
