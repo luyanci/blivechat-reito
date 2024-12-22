@@ -130,11 +130,9 @@ class AppConfig:
                     'type': type_,
                     'query_interval': section.getfloat('query_interval'),
                 }
-                if type_ == 'TencentTranslateFree':
-                    translator_config['source_language'] = section['source_language']
-                    translator_config['target_language'] = section['target_language']
-                elif type_ == 'BilibiliTranslateFree':
-                    pass
+                if type_ in ['TencentTranslateFree','BilibiliTranslateFree']:
+                    logger.warning("%s was deprecated!",type_)
+                    continue
                 elif type_ == 'TencentTranslate':
                     translator_config['source_language'] = section['source_language']
                     translator_config['target_language'] = section['target_language']
