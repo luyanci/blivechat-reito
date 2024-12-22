@@ -59,7 +59,6 @@ class StartHandler(api.base.ApiHandler):  # noqa
     async def get(self):  
         async with ClientSession(cookies={'appkey': 'aae92bc66f3edfab'},headers=header) as session:
             res = await session.get('https://passport.bilibili.com/x/passport-login/web/qrcode/generate')
-            print(res.text)
             data = await res.json()
             login_url = data['data']['url']
             qrcode_key = data['data']['qrcode_key']
@@ -92,7 +91,6 @@ class CheckHandler(api.base.ApiHandler):  # noqa
                 cookies = session.cookie_jar.filter_cookies('https://bilibili.com')
                 with shelve.open('data/login') as db:
                     db['cookie'] = cookies
-                    print(cookies)
                     db['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 utils.request.reload_cookie()
                 self.write({
