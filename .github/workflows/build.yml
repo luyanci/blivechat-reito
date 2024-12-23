@@ -71,7 +71,7 @@ jobs:
             --add-data="log:log" \
             --add-data="frontend/dist:frontend/dist" \
             --hidden-import aiohttp \
-            --hidden-imporrt PIL \
+            --hidden-import PIL \
             --name blivechat \
             main.py
       - name: Bundle blivechat (Windows)
