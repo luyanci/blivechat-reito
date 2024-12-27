@@ -53,14 +53,12 @@ import _ from 'lodash'
 import general from './general'
 import Legacy from './Legacy'
 import LineLike from './LineLike'
-
 export default {
   name: 'StyleGenerator',
   components: {
     general,
     Legacy,
-    LineLike,
-    Room: () => import('@/views/Room'),
+    LineLike
   },
   data() {
     // 数据流：

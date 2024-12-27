@@ -61,14 +61,10 @@ export default {
       chatClient: null,
       textEmoticons: [], // 官方的文本表情（后端配置的）
       pronunciationConverter: null,
-<<<<<<< HEAD
       danmu_pic_json: [],
-      textEmoticons: [], // 官方的文本表情
       uidColorMap: {},
-=======
 
-      customStyleElement, // 仅用于样式生成器中预览样式
->>>>>>> fd1518d (样式生成器预览放到iframe，防止影响到外面网页)
+      customStyleElement // 仅用于样式生成器中预览样式
     }
   },
   computed: {
