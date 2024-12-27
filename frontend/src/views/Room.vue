@@ -198,7 +198,6 @@ export default {
       }
 
 
-
       // 在页面刷新缓存时, 读取用户emoticons.json, 并建立表情包库
       axios.get('/emoticons.json')
         .then(res => {

@@ -57,6 +57,7 @@ import LineLike from './LineLike'
 export default {
   name: 'StyleGenerator',
   components: {
+    general,
     Legacy,
     LineLike,
     Room: () => import('@/views/Room'),
