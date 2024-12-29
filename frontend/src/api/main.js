@@ -1,4 +1,4 @@
-import { apiClient as axios } from './base'
+import axios from 'axios'
 
 export async function getServerInfo() {
   return (await axios.get('/api/server_info')).data
