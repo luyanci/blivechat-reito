@@ -6,3 +6,4 @@ qrcode==7.4.2
 SQLAlchemy==2.0.19
 tornado==6.3.3
 typing_extensions==4.8.0
+pyinstaller==5.13.2
