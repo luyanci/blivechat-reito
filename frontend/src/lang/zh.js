@@ -9,6 +9,8 @@ export default {
     documentation: '文档',
     mall: 'B站商店',
     giftRecordOfficial: '打赏记录',
+    authors: '作者',
+
   },
   home: {
     roomIdEmpty: '房间ID不能为空',

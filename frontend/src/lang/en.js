@@ -9,6 +9,7 @@ export default {
     documentation: 'Documentation',
     mall: 'Mall',
     giftRecordOfficial: 'Super Chat Records',
+    authors: 'Authors',
   },
   home: {
     roomIdEmpty: "Room ID can't be empty",

@@ -51,6 +51,15 @@
           <template>{{ locale.name }}</template>
         </el-menu-item>
       </el-submenu>
+      <el-submenu index="3">
+        <template slot="title">
+          <i class="el-icon-s-custom"></i>{{ $t('sidebar.authors') }}
+        </template>
+        <a href="https://space.bilibili.com/300474" target="_blank"><el-menu-item>xfgryujk</el-menu-item></a>
+        <a href="https://space.bilibili.com/12236936" target="_blank"><el-menu-item>只熊KUMA</el-menu-item></a>
+        <a href="https://space.bilibili.com/2305653" target="_blank"><el-menu-item>铃当Reito</el-menu-item></a>
+        <a href="https://space.bilibili.com/282873551" target="_blank"><el-menu-item>YC酱luyancib</el-menu-item></a>
+      </el-submenu>
     </el-menu>
   </el-scrollbar>
 </template>

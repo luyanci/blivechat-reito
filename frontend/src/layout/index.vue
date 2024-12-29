@@ -12,13 +12,13 @@
         {{ APP_VERSION }}-230924
       </div>
       <div class="version">
-        <a href="https://space.bilibili.com/12236936" target="_blank">只熊KUMA</a>
-      </div>
-      <div class="version">
         <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2" target="_blank" style="color: #bed742;">使用教程</a>
       </div>
       <div class="version">
-        <a href="https://www.yuque.com/doodle-irifi/ueaigm/stntb3" target="_blank">下载更新/版本记录</a>
+        <a href="https://github.com/luyanci/blivechat-reito/releases" target="_blank">下载更新</a>
+      </div>
+      <div class="version">
+        <a href="https://www.yuque.com/doodle-irifi/ueaigm/stntb3" target="_blank">版本记录</a>
       </div>
       <div class="version">
         <a href="https://github.com/xfgryujk/blivechat/releases" target="_blank">下载原版blivechat</a>

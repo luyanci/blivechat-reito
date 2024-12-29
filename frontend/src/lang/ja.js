@@ -9,6 +9,7 @@ export default {
     documentation: 'ドキュメンテーション',
     mall: 'モール',
     giftRecordOfficial: 'スーパーチャット記録',
+    authors: '著者',
   },
   home: {
     roomIdEmpty: 'ルームのIDを空白にすることはできません',
@@ -23,7 +24,6 @@ export default {
     isLoginFalse: '未ログイン',
     useSecondaryScanCode: 'アカウントのセキュリティを保つため、サブアカウントを使ってQRコードでログインしてください。',
     useLoaderUrl: 'ローダーURLを使用する',
-
     openSpecificTutorial: '使用教程',
 
     general: '常規',
