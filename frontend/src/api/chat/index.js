@@ -2,6 +2,8 @@ import MD5 from 'crypto-js/md5'
 
 import { apiClient as axios } from '@/api/base'
 
+export const FATAL_ERROR_TYPE_AUTH_CODE_ERROR = 1
+
 export function getDefaultMsgHandler() {
   let dummyFunc = () => {}
   return {
@@ -11,7 +13,8 @@ export function getDefaultMsgHandler() {
     onAddSuperChat: dummyFunc,
     onDelSuperChat: dummyFunc,
     onUpdateTranslation: dummyFunc,
-
+  }
+}
 export class ChatClientFatalError extends Error {
   constructor(type, message) {
     super(message)
@@ -30,7 +33,7 @@ export function processAvatarUrl(avatarUrl) {
   return avatarUrl
 }
 
-export async function getAvatarUrl(uid, username) {
+export async function getAvatarUrl(uid, username, dm_v2) {
   if (uid === 0) {
     return getDefaultAvatarUrl(uid, username)
   }
