@@ -73,7 +73,7 @@ def init():
     if server is None:
         return False
 
-    services.plugin.init()
+
 
     update.check_update()
     return True
