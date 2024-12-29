@@ -9,7 +9,7 @@
         </router-link>
       </div>
       <div class="version">
-        {{ APP_VERSION }}-230924
+        {{ APP_VERSION }}
       </div>
       <div class="version">
         <a href="https://www.yuque.com/doodle-irifi/ueaigm/laogg2" target="_blank" style="color: #bed742;">使用教程</a>

@@ -161,7 +161,7 @@ def init_server():
     finally:
         if cfg.open_browser_at_startup:
             url = 'http://localhost/' if cfg.port == 80 else f'http://localhost:{cfg.port}/'
-            url += '?_v=' + update.DOODLEBEAR_VERSION
+            url += '?_v=' + update.YC_VER
             webbrowser.open(url)
     logger.info('Server started: %s:%d', cfg.host, cfg.port)
 
