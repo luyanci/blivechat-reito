@@ -93,12 +93,12 @@ jobs:
             main.py
       - name: Package Bundle
         working-directory: dist
-        run: 7z a -tzip blivechat-bear-${{ matrix.os }}-x64.zip blivechat
+        run: 7z a -tzip blivechat-bear-${{ runner.os }}-${{ runner.arch }}.zip blivechat
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: blivechat-${{ runner.os }}-x64
+          name: blivechat-${{ matrix.os }}
           path: dist/blivechat-*.zip
 
   release:
