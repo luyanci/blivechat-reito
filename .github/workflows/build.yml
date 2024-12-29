@@ -14,7 +14,7 @@ jobs:
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           submodules: recursive
@@ -26,7 +26,7 @@ jobs:
           else
             echo "tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -36,7 +36,7 @@ jobs:
           npm install
           npm run build
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend
           path: frontend/dist
@@ -45,35 +45,42 @@ jobs:
     needs: frontend
     strategy:
       matrix:
-        os: [windows]
-    runs-on: ${{ matrix.os }}-latest
+        os: [windows-latest,ubuntu-latest,macos-latest,macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Download Frontend
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend
           path: frontend/dist
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
 
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
 
       - name: Bundle blivechat (Unix)
-        if: matrix.os != 'windows'
+        if: runner.os != 'windows'
         run: |
           pip3 install pyinstaller
           pyinstaller --noconfirm \
             --add-data="data:data" \
             --add-data="log:log" \
             --add-data="frontend/dist:frontend/dist" \
+            --hidden-import aiohttp \
+            --hidden-import PIL \
             --name blivechat \
             main.py
       - name: Bundle blivechat (Windows)
-        if: matrix.os == 'windows'
+        if: runner.os == 'windows'
         run: |
           pip3 install pyinstaller
           pyinstaller --noconfirm `
@@ -84,12 +91,13 @@ jobs:
             main.py
       - name: Package Bundle
         working-directory: dist
-        run: 7z a -tzip blivechat-orig-${{ matrix.os }}-x64.zip blivechat
+        run: 7z a -tzip blivechat-orig-${{ runner.os }}-${{ runner.arch }}.zip blivechat
+
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: blivechat-${{ matrix.os }}-x64
+          name: blivechat-${{ matrix.os }}
           path: dist/blivechat-*.zip
 
   release:
@@ -99,7 +107,7 @@ jobs:
       contents: write
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
