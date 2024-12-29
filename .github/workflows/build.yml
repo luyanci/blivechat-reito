@@ -45,8 +45,8 @@ jobs:
     needs: frontend
     strategy:
       matrix:
-        os: [windows]
-    runs-on: ${{ matrix.os }}-latest
+        os: [windows-latest,ubuntu-latest,macos-latest,macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -93,7 +93,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: blivechat-${{ matrix.os }}-x64
+          name: blivechat-${{ runner.os }}-x64
           path: dist/blivechat-*.zip
 
   release:
