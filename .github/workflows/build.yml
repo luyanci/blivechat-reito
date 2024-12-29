@@ -68,7 +68,7 @@ jobs:
         run: pip3 install -r requirements.txt
 
       - name: Bundle blivechat (Unix)
-        if: matrix.os != 'windows'
+        if: runner.os != 'windows'
         run: |
           pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm \
@@ -80,7 +80,7 @@ jobs:
             --name blivechat \
             main.py
       - name: Bundle blivechat (Windows)
-        if: matrix.os == 'windows'
+        if: runner.os == 'windows'
         run: |
           pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm `
