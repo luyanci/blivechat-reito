@@ -45,8 +45,8 @@ jobs:
     needs: frontend
     strategy:
       matrix:
-        os: [windows]
-    runs-on: ${{ matrix.os }}-latest
+        os: [windows-latest,ubuntu-latest,macos-latest,macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -59,11 +59,16 @@ jobs:
           name: frontend
           path: frontend/dist
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
       - name: Install Dependencies
         run: pip3 install -r requirements.txt
 
       - name: Bundle blivechat (Unix)
-        if: matrix.os != 'windows'
+        if: runner.os != 'windows'
         run: |
           pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm \
@@ -75,7 +80,7 @@ jobs:
             --name blivechat \
             main.py
       - name: Bundle blivechat (Windows)
-        if: matrix.os == 'windows'
+        if: runner.os == 'windows'
         run: |
           pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm `
@@ -88,12 +93,12 @@ jobs:
             main.py
       - name: Package Bundle
         working-directory: dist
-        run: 7z a -tzip blivechat-bear-${{ matrix.os }}-x64.zip blivechat
+        run: 7z a -tzip blivechat-bear-${{ runner.os }}-${{ runner.arch }}.zip blivechat
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: blivechat-${{ matrix.os }}-x64
+          name: blivechat-${{ matrix.os }}
           path: dist/blivechat-*.zip
 
   release:
