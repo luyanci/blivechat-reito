@@ -10,13 +10,13 @@ const NAMES = [
   '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA',
   '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA',
   '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA', '只熊KUMA',
-  'luyanci','luyanci','luyanci','luyanci','luyanci','luyanci','luyanci','luyanci','luyanci','luyanci',
-  'YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib','YC酱luyancib'
+  'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci', 'luyanci',
+  'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib', 'YC酱luyancib'
 
 ]
 
 const MEDAL_NAME = [
-  '被炉', '轮椅人', '祈并者', '未川控', '棺材铺', '勋章名称', '勋章名称', '勋章名称', '白送了', '幻士', '玲喵','不dd雷'
+  '被炉', '轮椅人', '祈并者', '未川控', '棺材铺', '勋章名称', '勋章名称', '勋章名称', '白送了', '幻士', '玲喵', '不dd雷'
 ]
 
 const OFFICIAL_EMOJI_NAME = [
