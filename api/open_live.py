@@ -27,7 +27,7 @@ END_GAME_OPEN_LIVE_URL = OPEN_LIVE_BASE_URL + '/v2/app/end'
 GAME_HEARTBEAT_OPEN_LIVE_URL = OPEN_LIVE_BASE_URL + '/v2/app/heartbeat'
 GAME_BATCH_HEARTBEAT_OPEN_LIVE_URL = OPEN_LIVE_BASE_URL + '/v2/app/batchHeartbeat'
 
-COMMON_SERVER_BASE_URL = 'https://chat.bilisc.com'
+COMMON_SERVER_BASE_URL = 'https://blive.chat'
 START_GAME_COMMON_SERVER_URL = COMMON_SERVER_BASE_URL + '/api/internal/open_live/start_game'
 END_GAME_COMMON_SERVER_URL = COMMON_SERVER_BASE_URL + '/api/internal/open_live/end_game'
 GAME_HEARTBEAT_COMMON_SERVER_URL = COMMON_SERVER_BASE_URL + '/api/internal/open_live/game_heartbeat'
