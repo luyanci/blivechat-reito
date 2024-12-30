@@ -14,7 +14,7 @@ jobs:
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           submodules: recursive
@@ -26,7 +26,7 @@ jobs:
           else
             echo "tag=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
 
@@ -36,7 +36,7 @@ jobs:
           npm install
           npm run build
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend
           path: frontend/dist
@@ -48,13 +48,13 @@ jobs:
         os: [windows-latest,ubuntu-latest,macos-latest,macos-13]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           submodules: recursive
 
       - name: Download Frontend
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend
           path: frontend/dist
@@ -96,7 +96,7 @@ jobs:
         run: 7z a -tzip blivechat-bear-${{ runner.os }}-${{ runner.arch }}.zip blivechat
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: blivechat-${{ matrix.os }}
           path: dist/blivechat-*.zip
@@ -108,7 +108,7 @@ jobs:
       contents: write
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
