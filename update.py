@@ -11,8 +11,8 @@ DOODLEBEAR_VERSION = 'v1.8.2-230924'
 YC_VER= 'v1.8.9-lts'
 
 def check_update():
-    #pass
-    async_io.create_task_with_ref(_do_check_update())
+    pass
+    #async_io.create_task_with_ref(_do_check_update())
 
 
 async def _do_check_update():
