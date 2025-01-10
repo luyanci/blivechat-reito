@@ -91,7 +91,7 @@ jobs:
             main.py
       - name: Package Bundle
         working-directory: dist
-        run: 7z a -tzip blivechat-orig-${{ runner.os }}-${{ runner.arch }}.zip blivechat
+        run: 7z a -tzip blivechat-orig-beardom-${{ runner.os }}-${{ runner.arch }}.zip blivechat
 
 
       - name: Upload Artifact
