@@ -281,7 +281,7 @@ yt-live-chat-paid-message-renderer[dashboard-money-feed] #author-name.yt-live-ch
 }
 
 yt-live-chat-paid-message-renderer[dashboard-money-feed] #author-name.yt-live-chat-paid-message-renderer[is-deleted].yt-live-chat-paid-message-renderer::before {
-  content: 'â€‹';
+  /* content: 'â€‹'; */
   display: inline;
   width: 0;
 }
@@ -313,7 +313,6 @@ yt-live-chat-paid-message-renderer[allow-animations] #content.yt-live-chat-paid-
 
 #content.yt-live-chat-paid-message-renderer img.yt-live-chat-paid-message-renderer {
   /* B站表情有不是正方形的 */
-  /* width: var(--yt-live-chat-emoji-size); */
   width: auto;
   height: var(--yt-live-chat-emoji-size);
   margin: -1px 2px 1px 2px;
@@ -328,6 +327,7 @@ yt-live-chat-paid-message-renderer[dashboard-money-feed] #content.yt-live-chat-p
 
 yt-live-chat-paid-message-renderer[show-only-header] #content.yt-live-chat-paid-message-renderer {
   visibility: hidden;
+  display: none;
   padding: 0;
 }
 
@@ -377,4 +377,17 @@ yt-live-chat-paid-message-renderer[show-footer-divider] #footer.yt-live-chat-pai
 
 yt-live-chat-paid-message-renderer[is-user-editable] #footer.yt-live-chat-paid-message-renderer:not(:empty) {
   padding-top: 8px;
+}
+
+/** block 的消失动画 */
+yt-live-chat-paid-message-renderer[is-deleted] {
+  animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  animation: anim_bottom_up_fade_out 600ms;
+  animation-fill-mode: forwards;
+}
+
+/** 从下往上升起 + 淡出动画 */
+@keyframes anim_bottom_up_fade_out {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-18px); display: none;}
 }

@@ -7,17 +7,30 @@
         <yt-live-chat-ticker-paid-message-item-renderer v-for="message in showMessages" :key="message.raw.id"
           tabindex="0" class="style-scope yt-live-chat-ticker-renderer" style="overflow: hidden;"
           @click="onItemClick(message.raw)"
+          :privilegeType="message.raw.type == MESSAGE_TYPE_MEMBER ? message.raw.privilegeType : ''"
+          :type="message.raw.type"
+          :price="message.raw.price"
+          :giftName="message.raw.giftName"
+          :style="{
+            '--yt-live-chat-ticker-item-primary-color': message.bgColor.primaryColor,
+            '--yt-live-chat-ticker-item-secondary-color': message.bgColor.secondaryColor
+          }"
         >
           <div id="container" dir="ltr" class="style-scope yt-live-chat-ticker-paid-message-item-renderer" :style="{
-            background: message.bgColor,
+            background: message.formatBgColor,
           }">
-            <div id="content" class="style-scope yt-live-chat-ticker-paid-message-item-renderer" :style="{
+            <div id="content" :type="message.raw.type === MESSAGE_TYPE_MEMBER ? MESSAGE_TYPE_MEMBER : MESSAGE_TYPE_SUPER_CHAT" class="style-scope yt-live-chat-ticker-paid-message-item-renderer" :style="{
               color: message.color
             }">
               <img-shadow id="author-photo" height="24" width="24" class="style-scope yt-live-chat-ticker-paid-message-item-renderer"
                 :imgUrl="message.raw.avatarUrl"
               ></img-shadow>
-              <span id="text" dir="ltr" class="style-scope yt-live-chat-ticker-paid-message-item-renderer">{{ message.text }}</span>
+              <span id="text" dir="ltr" class="style-scope yt-live-chat-ticker-paid-message-item-renderer" v-if="message.raw.giftName !== undefined">{{
+                message.raw.giftName +"x"+ message.raw.num
+              }}</span>
+              <span  id="text" dir="ltr" class="style-scope yt-live-chat-ticker-paid-message-item-renderer" v-if="message.raw.giftName == undefined">{{
+                message.text
+              }}</span>
             </div>
           </div>
         </yt-live-chat-ticker-paid-message-item-renderer>
@@ -79,6 +92,7 @@ export default {
         res.push({
           raw: message,
           bgColor: this.getBgColor(message),
+          formatBgColor: this.getFormatBgColor(message),
           color: this.getColor(message),
           text: this.getText(message)
         })
@@ -141,6 +155,12 @@ export default {
         color1 = config.colors.contentBg
         color2 = config.colors.headerBg
       }
+      
+      return { primaryColor: color1, secondaryColor: color2 }
+    },
+    getFormatBgColor(message) {
+      let color = this.getBgColor(message)
+
       let pinTime = this.getPinTime(message)
       let progress = (1 - ((this.curTime - message.addTime) / (60 * 1000) / pinTime)) * 100
       if (progress < 0) {
@@ -148,7 +168,10 @@ export default {
       } else if (progress > 100) {
         progress = 100
       }
-      return `linear-gradient(90deg, ${color1}, ${color1} ${progress}%, ${color2} ${progress}%, ${color2})`
+      return `linear-gradient(90deg, var(--yt-live-chat-ticker-item-primary-color ,${color.primaryColor}), \
+              var(--yt-live-chat-ticker-item-primary-color ,${color.primaryColor}) ${progress}%, \
+              var(--yt-live-chat-ticker-item-secondary-color ,${color.secondaryColor}) ${progress}%, \
+              var(--yt-live-chat-ticker-item-secondary-color ,${color.secondaryColor}))`
     },
     getColor(message) {
       if (message.type === constants.MESSAGE_TYPE_MEMBER) {
@@ -158,13 +181,19 @@ export default {
     },
     getText(message) {
       if (message.type === constants.MESSAGE_TYPE_MEMBER) {
-        return this.$t('chat.tickerMembership')
+        return ''
       }
       return `CN¥${formatCurrency(message.price)}`
     },
     getPinTime(message) {
       if (message.type === constants.MESSAGE_TYPE_MEMBER) {
-        return 2
+        if (message.privilegeType === 3) {
+          return 5
+        } else if (message.privilegeType === 2) {
+          return 15
+        } else if (message.privilegeType === 1) {
+          return 30
+        }
       }
       return constants.getPriceConfig(message.price).pinTime
     },

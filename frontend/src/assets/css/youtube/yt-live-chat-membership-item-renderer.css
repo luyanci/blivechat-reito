@@ -125,6 +125,7 @@ yt-live-chat-membership-item-renderer {
   padding: 4px 24px;
 }
 
+
 yt-live-chat-membership-item-renderer[dashboard-money-feed] {
   padding: 0;
 
@@ -248,6 +249,14 @@ yt-live-chat-membership-item-renderer[dashboard-money-feed] yt-live-chat-author-
   font-size: 15px;
 }
 
+yt-live-chat-membership-item-renderer #header-subtext::before {
+  content: "";
+}
+
+yt-live-chat-membership-item-renderer #header-subtext::after {
+  content: "\4e0a\8230";
+}
+
 #header-subtext.yt-live-chat-membership-item-renderer:empty {
   display: none;
 }
@@ -359,4 +368,17 @@ yt-live-chat-membership-item-renderer[show-only-header] #menu.yt-live-chat-membe
 yt-live-chat-membership-item-renderer[dashboard-money-feed] #menu.yt-live-chat-membership-item-renderer {
   margin-top: 8px;
   background: linear-gradient(to right, transparent, var(--yt-live-chat-background-color) 40%);
+}
+
+/** block 的消失动画 */
+yt-live-chat-membership-item-renderer[is-deleted] {
+  animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  animation: anim_bottom_up_fade_out 600ms;
+  animation-fill-mode: forwards;
+}
+
+/** 从下往上升起 + 淡出动画 */
+@keyframes anim_bottom_up_fade_out {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-18px); display: none;}
 }

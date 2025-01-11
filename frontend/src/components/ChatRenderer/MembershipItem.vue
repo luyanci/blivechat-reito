@@ -1,6 +1,6 @@
 <template>
   <yt-live-chat-membership-item-renderer class="style-scope yt-live-chat-item-list-renderer" show-only-header
-    :blc-guard-level="privilegeType"
+    :privilegeType="privilegeType"
   >
     <div id="card" class="style-scope yt-live-chat-membership-item-renderer">
       <div id="header" class="style-scope yt-live-chat-membership-item-renderer">
