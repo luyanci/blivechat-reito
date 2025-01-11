@@ -30,6 +30,7 @@
               :width="content.width" :height="content.height"
               :class="{ 'blc-large-emoji': content.height >= 100 }"
             >
+          <span :key="index" v-else-if="content.type === CONTENT_TYPE_AT">@{{ content.uname }} </span>
           </template>
           <el-badge :value="repeated" :max="99" v-if="repeated > 1"
             class="style-scope yt-live-chat-text-message-renderer"
@@ -72,7 +73,8 @@ export default {
   data() {
     return {
       CONTENT_TYPE_TEXT: constants.CONTENT_TYPE_TEXT,
-      CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE
+      CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE,
+      CONTENT_TYPE_AT: constants.CONTENT_TYPE_AT,
     }
   },
   computed: {
