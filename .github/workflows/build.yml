@@ -70,7 +70,7 @@ jobs:
       - name: Bundle blivechat (Unix)
         if: runner.os != 'windows'
         run: |
-          pip3 install pyinstaller
+          pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm \
             --add-data="data:data" \
             --add-data="log:log" \
@@ -82,7 +82,7 @@ jobs:
       - name: Bundle blivechat (Windows)
         if: runner.os == 'windows'
         run: |
-          pip3 install pyinstaller
+          pip3 install pyinstaller==5.13.2
           pyinstaller --noconfirm `
             --add-data="data;data" `
             --add-data="log;log" `
