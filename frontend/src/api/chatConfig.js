@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { mergeConfig } from '@/utils'
 
 export const DEFAULT_CONFIG = {
-  minGiftPrice: 7, // $1
+  minGiftPrice: 0.1,
   showDanmaku: true,
   showGift: true,
   showGiftName: false,
@@ -19,9 +19,11 @@ export const DEFAULT_CONFIG = {
   blockUsers: '',
   blockMedalLevel: 0,
 
+  showDebugMessages: false,
   relayMessagesByServer: false,
   autoTranslate: false,
   giftUsernamePronunciation: '',
+  importPresetCss: false,
 
   emoticons: [] // [{ keyword: '', url: '' }, ...]
 }
@@ -42,7 +44,10 @@ export function getLocalConfig() {
     sanitizeConfig(config)
     return config
   } catch {
-    return deepCloneDefaultConfig()
+    let config = deepCloneDefaultConfig()
+    // 新用户默认开启调试消息，免得总有人问
+    config.showDebugMessages = true
+    return config
   }
 }
 

@@ -12,6 +12,7 @@ from typing import *
 
 import aiohttp
 import tornado.websocket
+import yarl
 
 import api.base
 import blivedm.blivedm.clients.web as dm_web_cli
@@ -20,6 +21,7 @@ import config
 import services.avatar
 import services.chat
 import services.translate
+import utils.async_io
 import utils.request
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,8 @@ class ContentType(enum.IntEnum):
 
 class FatalErrorType(enum.IntEnum):
     AUTH_CODE_ERROR = 1
+    TOO_MANY_RETRIES = 2
+    TOO_MANY_CONNECTIONS = 3
 
 
 def make_message_body(cmd, data):
@@ -71,7 +75,8 @@ def make_text_message_data(
     translation: str = '',
     content_type: int = ContentType.TEXT,
     content_type_params: list = None,
-    uid: int = 0
+    uid: str = '',
+    medal_name: str = '',
 ):
     # 为了节省带宽用list而不是dict
     return [
@@ -108,7 +113,9 @@ def make_text_message_data(
         # 15: textEmoticons
         [],  # 已废弃，保留
         # 16: uid
-        uid
+        uid,
+        # 17: medalName
+        medal_name,
     ]
 
 
@@ -202,21 +209,10 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
 
         room_key_dict = data.get('roomKey', None)
         if room_key_dict is not None:
-            room_key_type = services.chat.RoomKeyType(room_key_dict['type'])
-            room_key_value = room_key_dict['value']
-            if room_key_type == services.chat.RoomKeyType.ROOM_ID:
-                if not isinstance(room_key_value, int):
-                    raise TypeError(f'Room key value type error, value={room_key_value}')
-            elif room_key_type == services.chat.RoomKeyType.AUTH_CODE:
-                if not isinstance(room_key_value, str):
-                    raise TypeError(f'Room key value type error, value={room_key_value}')
-            else:
-                raise ValueError(f'Unknown RoomKeyType={room_key_type}')
+            self.room_key = services.chat.RoomKey.from_dict(room_key_dict)
         else:
             # 兼容旧版客户端 TODO 过几个版本可以移除
-            room_key_type = services.chat.RoomKeyType.ROOM_ID
-            room_key_value = int(data['roomId'])
-        self.room_key = services.chat.RoomKey(room_key_type, room_key_value)
+            self.room_key = services.chat.RoomKey(services.chat.RoomKeyType.ROOM_ID, int(data['roomId']))
         logger.info('client=%s joining room %s', self.request.remote_ip, self.room_key)
 
         try:
@@ -226,15 +222,17 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
             pass
 
         services.chat.client_room_manager.add_client(self.room_key, self)
-        asyncio.create_task(self._on_joined_room())
+        utils.async_io.create_task_with_ref(self._on_joined_room())
 
         self._refresh_receive_timeout_timer()
 
-    # 跨域测试用
     def check_origin(self, origin):
-        if self.application.settings['debug']:
-            return True
-        return super().check_origin(origin)
+        cfg = config.get_config()
+        return (
+            cfg.debug  # 开发时前端localhost直连
+            or cfg.is_allowed_cors_origin(origin)
+            or super().check_origin(origin)  # 和Host相同
+        )
 
     @property
     def has_joined_room(self):
@@ -250,24 +248,24 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
             self.close()
 
     async def _on_joined_room(self):
-        if self.settings['debug']:
+        cfg = config.get_config()
+        if cfg.debug:
             await self._send_test_message()
 
         # 不允许自动翻译的提示
-        if self.auto_translate:
-            cfg = config.get_config()
-            if (
-                cfg.allow_translate_rooms
-                # 身份码就不管了吧，反正配置正确的情况下不会看到这个提示
-                and self.room_key.type == services.chat.RoomKeyType.ROOM_ID
-                and self.room_key.value not in cfg.allow_translate_rooms
-            ):
-                self.send_cmd_data(Command.ADD_TEXT, make_text_message_data(
-                    author_name='blivechat',
-                    author_type=2,
-                    content='Translation is not allowed in this room. Please download to use translation',
-                    author_level=60,
-                ))
+        if (
+            self.auto_translate
+            and cfg.allow_translate_rooms
+            # 身份码就不管了吧，反正配置正确的情况下不会看到这个提示
+            and self.room_key.type == services.chat.RoomKeyType.ROOM_ID
+            and self.room_key.value not in cfg.allow_translate_rooms
+        ):
+            self.send_cmd_data(Command.ADD_TEXT, make_text_message_data(
+                author_name='blivechat',
+                author_type=2,
+                content='Translation is not allowed in this room. Please download to use translation',
+                author_level=60,
+            ))
 
     # 测试用
     async def _send_test_message(self):
@@ -323,29 +321,38 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
         gift_data['totalCoin'] = 1245000
         gift_data['giftName'] = '小电视飞船'
         self.send_cmd_data(Command.ADD_GIFT, gift_data)
+        gift_data['id'] = uuid.uuid4().hex
+        gift_data['totalCoin'] = 0
+        gift_data['totalFreeCoin'] = 1000
+        gift_data['giftName'] = '辣条'
+        gift_data['num'] = 10
+        self.send_cmd_data(Command.ADD_GIFT, gift_data)
 
 
 class RoomInfoHandler(api.base.ApiHandler):
     async def get(self):
         room_id = int(self.get_query_argument('roomId'))
         logger.info('client=%s getting room info, room=%d', self.request.remote_ip, room_id)
-        room_id, owner_uid = await self._get_room_info(room_id)
-        # 连接其他host必须要key
-        host_server_list = dm_web_cli.DEFAULT_DANMAKU_SERVER_LIST
-        if owner_uid == 0:
-            # 缓存3分钟
-            self.set_header('Cache-Control', 'private, max-age=180')
-        else:
-            # 缓存1天
-            self.set_header('Cache-Control', 'private, max-age=86400')
+
+        (room_id, owner_uid), (host_server_list, host_server_token), buvid = await asyncio.gather(
+            self._get_room_info(room_id),
+            self._get_server_host_list_and_token(room_id),
+            self._get_buvid()
+        )
+
+        # 缓存1分钟
+        self.set_header('Cache-Control', 'private, max-age=60')
         self.write({
             'roomId': room_id,
             'ownerUid': owner_uid,
-            'hostServerList': host_server_list
+            'hostServerList': host_server_list,
+            'hostServerToken': host_server_token,
+            # 虽然没什么用但还是加上比较保险
+            'buvid': buvid,
         })
 
     @staticmethod
-    async def _get_room_info(room_id):
+    async def _get_room_info(room_id) -> Tuple[int, int]:
         try:
             async with utils.request.http_session.get(
                 dm_web_cli.ROOM_INIT_URL,
@@ -374,9 +381,65 @@ class RoomInfoHandler(api.base.ApiHandler):
         room_info = data['data']['room_info']
         return room_info['room_id'], room_info['uid']
 
+    async def _get_server_host_list_and_token(self, room_id) -> Tuple[dict, Optional[str]]:
+        try:
+            async with utils.request.http_session.get(
+                dm_web_cli.DANMAKU_SERVER_CONF_URL,
+                headers={
+                    # token会对UA签名，要使用和客户端一样的UA
+                    'User-Agent': self.request.headers.get('User-Agent', '')
+                },
+                params={
+                    'id': room_id,
+                    'type': 0
+                }
+            ) as res:
+                if res.status != 200:
+                    logger.warning('room %d _get_server_host_list failed: %d %s', room_id,
+                                   res.status, res.reason)
+                    return dm_web_cli.DEFAULT_DANMAKU_SERVER_LIST, None
+                data = await res.json()
+        except (aiohttp.ClientConnectionError, asyncio.TimeoutError):
+            logger.exception('room %d _get_server_host_list failed', room_id)
+            return dm_web_cli.DEFAULT_DANMAKU_SERVER_LIST, None
+
+        if data['code'] != 0:
+            logger.warning('room %d _get_server_host_list failed: %s', room_id, data['message'])
+            return dm_web_cli.DEFAULT_DANMAKU_SERVER_LIST, None
+
+        data = data['data']
+        host_server_list = data['host_list']
+        if not host_server_list:
+            logger.warning('room %d _get_server_host_list failed: host_server_list is empty')
+            return dm_web_cli.DEFAULT_DANMAKU_SERVER_LIST, None
+
+        host_server_token = data.get('token', None)
+        return host_server_list, host_server_token
+
+    async def _get_buvid(self):
+        buvid = self._do_get_buvid()
+        if buvid != '':
+            return buvid
+
+        try:
+            async with utils.request.http_session.get(dm_web_cli.BUVID_INIT_URL):
+                pass
+        except (aiohttp.ClientConnectionError, asyncio.TimeoutError):
+            pass
+        return self._do_get_buvid()
+
+    @staticmethod
+    def _do_get_buvid():
+        cookies = utils.request.http_session.cookie_jar.filter_cookies(yarl.URL(dm_web_cli.BUVID_INIT_URL))
+        buvid_cookie = cookies.get('buvid3', None)
+        if buvid_cookie is None:
+            return ''
+        return buvid_cookie.value
+
 
 class AvatarHandler(api.base.ApiHandler):
     async def get(self):
+        # uid基本是0了，现在都是前端计算默认头像URL，这个接口留着只是为了兼容旧版
         uid = int(self.get_query_argument('uid'))
         username = self.get_query_argument('username', '')
         dm_v2 = self.get_query_argument('dm_v2', None)
@@ -395,11 +458,10 @@ class AvatarHandler(api.base.ApiHandler):
         avatar_url = await services.avatar.get_avatar_url_or_none(uid)
         if avatar_url is None:
             avatar_url = services.avatar.get_default_avatar_url(uid, username)
-            # 缓存3分钟
-            self.set_header('Cache-Control', 'private, max-age=180')
+            cache_time = 86400 if uid == 0 else 180
         else:
-            # 缓存1天
-            self.set_header('Cache-Control', 'private, max-age=86400')
+            cache_time = 86400
+        self.set_header('Cache-Control', f'private, max-age={cache_time}')
         self.write({'avatarUrl': avatar_url})
 
 

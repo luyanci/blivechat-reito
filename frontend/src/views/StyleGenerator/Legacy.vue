@@ -135,6 +135,11 @@
               <el-input v-model.number="form.emoticonSize" type="number" min="0"></el-input>
             </el-form-item>
           </el-col>
+          <el-col :xs="24" :sm="12">
+            <el-form-item :label="$t('stylegen.largeEmoticonSize')">
+              <el-input v-model.number="form.largeEmoticonSize" type="number" min="0"></el-input>
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-card>
 
@@ -384,6 +389,7 @@ export const DEFAULT_CONFIG = {
   messageColor: '#ffffff',
   messageOnNewLine: false,
   emoticonSize: 18,
+  largeEmoticonSize: 36,
 
   showTime: false,
   timeFont: 'Imprima',
@@ -479,7 +485,7 @@ yt-live-chat-text-message-renderer {
       return `/* Outlines */
 yt-live-chat-renderer * {
   ${this.showOutlinesStyle}
-  font-family: "${common.cssEscapeStr(this.form.messageFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.messageFont)};
   font-size: ${this.form.messageFontSize}px !important;
   line-height: ${this.form.messageLineHeight || this.form.messageFontSize}px !important;
 }`
@@ -519,7 +525,7 @@ yt-live-chat-text-message-renderer yt-live-chat-author-badge-renderer[type="memb
 yt-live-chat-text-message-renderer #author-name {
   ${this.form.showUserNames ? '' : 'display: none !important;'}
   ${this.form.userNameColor ? `color: ${this.form.userNameColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.userNameFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.userNameFont)};
   font-size: ${this.form.userNameFontSize}px !important;
   line-height: ${this.form.userNameLineHeight || this.form.userNameFontSize}px !important;
 }
@@ -541,7 +547,7 @@ yt-live-chat-text-message-renderer #chat-badges {
 yt-live-chat-text-message-renderer #message,
 yt-live-chat-text-message-renderer #message * {
   ${this.form.messageColor ? `color: ${this.form.messageColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.messageFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.messageFont)};
   font-size: ${this.form.messageFontSize}px !important;
   line-height: ${this.form.messageLineHeight || this.form.messageFontSize}px !important;
 }
@@ -554,6 +560,10 @@ ${!this.form.messageOnNewLine ? '' : `yt-live-chat-text-message-renderer #messag
 yt-live-chat-text-message-renderer #message .emoji {
   width: auto !important;
   height: ${this.form.emoticonSize}px !important;
+}
+
+yt-live-chat-text-message-renderer #message .emoji.blc-large-emoji {
+  height: ${this.form.largeEmoticonSize}px !important;
 }`
     },
     timeStyle() {
@@ -599,7 +609,7 @@ yt-live-chat-paid-message-renderer #author-name *,
 yt-live-chat-membership-item-renderer #header-content-inner-column,
 yt-live-chat-membership-item-renderer #header-content-inner-column * {
   ${this.form.firstLineColor ? `color: ${this.form.firstLineColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.firstLineFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.firstLineFont)};
   font-size: ${this.form.firstLineFontSize}px !important;
   line-height: ${this.form.firstLineLineHeight || this.form.firstLineFontSize}px !important;
 }
@@ -609,7 +619,7 @@ yt-live-chat-paid-message-renderer #purchase-amount *,
 yt-live-chat-membership-item-renderer #header-subtext,
 yt-live-chat-membership-item-renderer #header-subtext * {
   ${this.form.secondLineColor ? `color: ${this.form.secondLineColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.secondLineFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.secondLineFont)};
   font-size: ${this.form.secondLineFontSize}px !important;
   line-height: ${this.form.secondLineLineHeight || this.form.secondLineFontSize}px !important;
 }
@@ -617,7 +627,7 @@ yt-live-chat-membership-item-renderer #header-subtext * {
 yt-live-chat-paid-message-renderer #content,
 yt-live-chat-paid-message-renderer #content * {
   ${this.form.scContentColor ? `color: ${this.form.scContentColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.scContentFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.scContentFont)};
   font-size: ${this.form.scContentFontSize}px !important;
   line-height: ${this.form.scContentLineHeight || this.form.scContentFontSize}px !important;
 }`
@@ -643,7 +653,7 @@ yt-live-chat-ticker-paid-message-item-renderer *,
 yt-live-chat-ticker-sponsor-item-renderer,
 yt-live-chat-ticker-sponsor-item-renderer * {
   ${this.form.secondLineColor ? `color: ${this.form.secondLineColor} !important;` : ''}
-  font-family: "${common.cssEscapeStr(this.form.secondLineFont)}"${common.FALLBACK_FONTS};
+  font-family: ${common.fontsStrToCss(this.form.secondLineFont)};
 }`
     },
     animationStyle() {
@@ -656,7 +666,7 @@ yt-live-chat-ticker-sponsor-item-renderer * {
       this.saveConfig()
     }
   },
-  created() {
+  mounted() {
     this.$emit('input', this.result)
   },
   methods: {

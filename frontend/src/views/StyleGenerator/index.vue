@@ -18,6 +18,9 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="copyResult">{{ $t('stylegen.copy') }}</el-button>
+            <a target="_blank" href="https://vscode.dev/">
+              <el-button style="margin: 0 10px">{{ $t('stylegen.editor') }}</el-button>
+            </a>
             <el-button @click="resetConfig">{{ $t('stylegen.resetConfig') }}</el-button>
           </el-form-item>
         </el-card>
@@ -25,19 +28,17 @@
     </el-col>
 
     <el-col :sm="24" :md="8">
-      <div :style="{ position: 'relative', top: `${exampleTop}px` }">
+      <div id="example-panel">
         <el-form inline style="line-height: 40px">
           <el-form-item :label="$t('stylegen.playAnimation')" style="margin: 0">
-            <el-switch v-model="playAnimation" @change="onPlayAnimationChange"></el-switch>
+            <el-switch v-model="playAnimation" @change="setExampleRoomClientStart"></el-switch>
           </el-form-item>
           <el-form-item :label="$t('stylegen.backgrounds')" style="margin: 0 0 0 30px">
             <el-switch v-model="exampleBgLight" :active-text="$t('stylegen.light')" :inactive-text="$t('stylegen.dark')"></el-switch>
           </el-form-item>
         </el-form>
         <div id="example-container" :class="{ light: exampleBgLight }">
-          <div id="fakebody">
-            <room ref="room"></room>
-          </div>
+          <iframe id="example-room-iframe" ref="exampleRoomIframe" :src="exampleRoomUrl" frameborder="0"></iframe>
         </div>
       </div>
     </el-col>
@@ -49,19 +50,14 @@ import _ from 'lodash'
 
 import Legacy from './Legacy'
 import LineLike from './LineLike'
-import Room from '@/views/Room'
 
 export default {
   name: 'StyleGenerator',
-  components: {
-    Legacy, LineLike, Room
-  },
+  components: { Legacy, LineLike },
   data() {
-    let styleElement = document.createElement('style')
-    document.head.appendChild(styleElement)
     // 数据流：
     //                                                   输入框 --\
-    // 子组件 -> subComponentResults -> subComponentResult -> inputResult -> 防抖延迟0.5s后 -> debounceResult -> exampleCss
+    // 子组件 -> subComponentResults -> subComponentResult -> inputResult -> 防抖延迟0.5s后 -> debounceResult
     return {
       // 子组件的结果
       subComponentResults: {
@@ -74,20 +70,17 @@ export default {
       // 防抖后延迟变化的结果
       debounceResult: '',
 
-      styleElement,
-      exampleTop: 0,
       playAnimation: true,
       exampleBgLight: false
     }
   },
   computed: {
+    exampleRoomUrl() {
+      return this.$router.resolve({ name: 'test_room', query: { lang: this.$i18n.locale } }).href
+    },
     // 子组件的结果
     subComponentResult() {
       return this.subComponentResults[this.activeTab]
-    },
-    // 应用到预览上的CSS
-    exampleCss() {
-      return this.debounceResult.replace(/^body\b/gm, '#fakebody')
     }
   },
   watch: {
@@ -97,35 +90,47 @@ export default {
     inputResult: _.debounce(function(val) {
       this.debounceResult = val
     }, 500),
-    exampleCss(val) {
-      this.styleElement.innerText = val
-    }
+    debounceResult: 'setExampleRoomCustomCss'
   },
   mounted() {
     this.debounceResult = this.inputResult = this.subComponentResult
 
-    this.$parent.$el.addEventListener('scroll', this.onParentScroll)
+    window.addEventListener('message', this.onWindowMessage)
   },
   beforeDestroy() {
-    this.$parent.$el.removeEventListener('scroll', this.onParentScroll)
-
-    document.head.removeChild(this.styleElement)
+    window.removeEventListener('message', this.onWindowMessage)
   },
   methods: {
-    onParentScroll(event) {
-      if (document.body.clientWidth <= 992) {
-        this.exampleTop = 0
-      } else {
-        this.exampleTop = event.target.scrollTop
+    sendMessageToExampleRoom(type, data = null) {
+      let msg = { type, data }
+      this.$refs.exampleRoomIframe.contentWindow.postMessage(msg, window.location.origin)
+    },
+    // 处理房间发送的消息
+    onWindowMessage(event) {
+      if (event.source !== this.$refs.exampleRoomIframe.contentWindow) {
+        return
+      }
+      if (event.origin !== window.location.origin) {
+        console.warn(`消息origin错误，${event.origin} != ${window.location.origin}`)
+        return
+      }
+
+      let { type } = event.data
+      switch (type) {
+      case 'stylegenExampleRoomLoad':
+        this.setExampleRoomCustomCss(this.debounceResult)
+        this.setExampleRoomClientStart(this.playAnimation)
+        break
       }
     },
-    onPlayAnimationChange(value) {
-      if (value) {
-        this.$refs.room.start()
-      } else {
-        this.$refs.room.stop()
-      }
+
+    setExampleRoomCustomCss(css) {
+      this.sendMessageToExampleRoom('roomSetCustomStyle', { css })
     },
+    setExampleRoomClientStart(isStart) {
+      this.sendMessageToExampleRoom(isStart ? 'roomStartClient' : 'roomStopClient')
+    },
+
     copyResult() {
       this.$refs.result.select()
       document.execCommand('Copy')
@@ -139,6 +144,13 @@ export default {
 </script>
 
 <style scoped>
+@media only screen and (min-width: 992px) {
+  #example-panel {
+    position: fixed;
+    width: calc((100vw - 230px - 40px) / 3 - 20px);
+  }
+}
+
 #example-container {
   height: calc(100vh - 150px);
 
@@ -180,8 +192,9 @@ export default {
     -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #eee));
 }
 
-#fakebody {
+#example-room-iframe {
   outline: 1px #999 dashed;
+  width: 100%;
   height: 100%;
 }
 </style>

@@ -5,7 +5,7 @@
     <ticker class="style-scope yt-live-chat-renderer" :messages.sync="paidMessages" :showGiftName="showGiftName"></ticker>
     <yt-live-chat-item-list-renderer class="style-scope yt-live-chat-renderer" allow-scroll>
       <div ref="scroller" id="item-scroller" class="style-scope yt-live-chat-item-list-renderer animated" @scroll="onScroll">
-        <div ref="itemOffset" id="item-offset" class="style-scope yt-live-chat-item-list-renderer" style="height: 0px;">
+        <div ref="itemOffset" id="item-offset" class="style-scope yt-live-chat-item-list-renderer">
           <div ref="items" id="items" class="style-scope yt-live-chat-item-list-renderer" style="overflow: hidden"
             :style="{ transform: `translateY(${Math.floor(scrollPixelsRemaining)}px)` }"
           >
@@ -26,7 +26,8 @@
                 :avatarUrl="message.avatarUrl"
                 :authorName="getShowAuthorName(message)"
                 :price="message.price"
-                :content="getGiftShowContent(message)"
+                :priceText="message.price <= 0 ? getGiftShowNameAndNum(message) : ''"
+                :content="message.price <= 0 ? '' : getGiftShowContent(message)"
               ></paid-message>
               <membership-item :key="message.id" v-else-if="message.type === MESSAGE_TYPE_MEMBER"
                 class="style-scope yt-live-chat-item-list-renderer"
@@ -53,6 +54,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import * as chatConfig from '@/api/chatConfig'
 import Ticker from './Ticker'
 import TextMessage from './TextMessage'
@@ -60,12 +62,12 @@ import MembershipItem from './MembershipItem'
 import PaidMessage from './PaidMessage'
 import * as constants from './constants'
 
-// 只有要添加的消息需要平滑
-const NEED_SMOOTH_MESSAGE_TYPES = [
+// 要添加的消息类型
+const ADD_MESSAGE_TYPES = [
   constants.MESSAGE_TYPE_TEXT,
   constants.MESSAGE_TYPE_GIFT,
   constants.MESSAGE_TYPE_MEMBER,
-  constants.MESSAGE_TYPE_SUPER_CHAT
+  constants.MESSAGE_TYPE_SUPER_CHAT,
 ]
 // 发送消息时间间隔范围
 const MESSAGE_MIN_INTERVAL = 80
@@ -149,6 +151,7 @@ export default {
     getGiftShowContent(message) {
       return constants.getGiftShowContent(message, this.showGiftName)
     },
+    getGiftShowNameAndNum: constants.getGiftShowNameAndNum,
     getShowContent: constants.getShowContent,
     getShowRichContent: constants.getShowRichContent,
     getShowAuthorName: constants.getShowAuthorName,
@@ -159,13 +162,14 @@ export default {
     addMessages(messages) {
       this.enqueueMessages(messages)
     },
+    // 后悔加这个功能了
     mergeSimilarText(content) {
       content = content.trim().toLowerCase()
-      let res = false
-      this.forEachRecentMessage(5, message => {
+      for (let message of this.iterRecentMessages(5)) {
         if (message.type !== constants.MESSAGE_TYPE_TEXT) {
-          return true
+          continue
         }
+
         let messageContent = message.content.trim().toLowerCase()
         let longer, shorter
         if (messageContent.length > content.length) {
@@ -175,51 +179,61 @@ export default {
           longer = content
           shorter = messageContent
         }
-        if (longer.indexOf(shorter) !== -1 // 长的包含短的
-            && longer.length - shorter.length < shorter.length // 长度差较小
+
+        if (
+          longer.indexOf(shorter) !== -1 // 长的包含短的
+          && longer.length - shorter.length < shorter.length // 长度差较小
         ) {
-          // 其实有小概率导致弹幕卡住
-          message.repeated++
-          res = true
-          return false
-        }
-        return true
-      })
-      return res
-    },
-    mergeSimilarGift(authorName, price, giftName, num) {
-      let res = false
-      this.forEachRecentMessage(5, message => {
-        if (message.type === constants.MESSAGE_TYPE_GIFT
-            && message.authorName === authorName
-            && message.giftName === giftName
-        ) {
-          message.price += price
-          message.num += num
-          res = true
-          return false
-        }
-        return true
-      })
-      return res
-    },
-    forEachRecentMessage(num, callback) {
-      // 从新到老遍历num条消息
-      for (let i = this.smoothedMessageQueue.length - 1; i >= 0 && num > 0; i--) {
-        let messageGroup = this.smoothedMessageQueue[i]
-        for (let j = messageGroup.length - 1; j >= 0 && num-- > 0; j--) {
-          if (!callback(messageGroup[j])) {
-            return
-          }
+          this.updateMessage(message.id, { $add: {
+            repeated: 1
+          } })
+          return true
         }
       }
-      for (let arr of [this.messagesBuffer, this.messages]) {
-        for (let i = arr.length - 1; i >= 0 && num-- > 0; i--) {
-          if (!callback(arr[i])) {
-            return
-          }
+      return false
+    },
+    mergeSimilarGift(authorName, price, _freePrice, giftName, num) {
+      for (let message of this.iterRecentMessages(5)) {
+        if (
+          message.type === constants.MESSAGE_TYPE_GIFT
+          && message.authorName === authorName
+          && message.giftName === giftName
+        ) {
+          this.updateMessage(message.id, { $add: {
+            price: price,
+            // freePrice: freePrice, // 暂时没用到
+            num: num
+          } })
+          return true
         }
       }
+      return false
+    },
+    // 从新到老迭代num条消息，注意会迭代smoothedMessageQueue，不会迭代paidMessages
+    *iterRecentMessages(num, onlyCountAddMessages = true) {
+      if (num <= 0) {
+        return
+      }
+      for (let arr of this.iterMessageArrs()) {
+        for (let i = arr.length - 1; i >= 0 && num > 0; i--) {
+          let message = arr[i]
+          yield message
+          if (!onlyCountAddMessages || this.isAddMessage(message)) {
+            num--
+          }
+        }
+        if (num <= 0) {
+          break
+        }
+      }
+    },
+    // 从新到老迭代消息的数组
+    *iterMessageArrs() {
+      for (let i = this.smoothedMessageQueue.length - 1; i >= 0; i--) {
+        yield this.smoothedMessageQueue[i]
+      }
+      yield this.messagesBuffer
+      yield this.messages
     },
     delMessage(id) {
       this.delMessages([id])
@@ -283,7 +297,7 @@ export default {
       let messageGroup = []
       for (let message of messages) {
         messageGroup.push(message)
-        if (this.messageNeedSmooth(message)) {
+        if (this.isAddMessage(message)) {
           this.smoothedMessageQueue.push(messageGroup)
           messageGroup = []
         }
@@ -306,8 +320,8 @@ export default {
         this.emitSmoothedMessageTimerId = window.setTimeout(this.emitSmoothedMessages)
       }
     },
-    messageNeedSmooth({ type }) {
-      return NEED_SMOOTH_MESSAGE_TYPES.indexOf(type) !== -1
+    isAddMessage({ type }) {
+      return ADD_MESSAGE_TYPES.indexOf(type) !== -1
     },
     emitSmoothedMessages() {
       this.emitSmoothedMessageTimerId = null
@@ -377,6 +391,7 @@ export default {
         case constants.MESSAGE_TYPE_GIFT:
         case constants.MESSAGE_TYPE_MEMBER:
         case constants.MESSAGE_TYPE_SUPER_CHAT:
+          // 这里处理的类型要和 ADD_MESSAGE_TYPES 一致
           this.handleAddMessage(message)
           break
         case constants.MESSAGE_TYPE_DEL:
@@ -393,53 +408,73 @@ export default {
       this.$nextTick(this.maybeScrollToBottom)
     },
     handleAddMessage(message) {
-      message = {
-        ...message,
-        addTime: new Date() // 添加一个本地时间给Ticker用，防止本地时间和服务器时间相差很大的情况
-      }
-      this.messagesBuffer.push(message)
+      // 添加一个本地时间给Ticker用，防止本地时间和服务器时间相差很大的情况
+      message.addTime = new Date()
 
       if (message.type !== constants.MESSAGE_TYPE_TEXT) {
-        this.paidMessages.unshift(message)
+        this.paidMessages.unshift(_.cloneDeep(message))
         const MAX_PAID_MESSAGE_NUM = 100
         if (this.paidMessages.length > MAX_PAID_MESSAGE_NUM) {
           this.paidMessages.splice(MAX_PAID_MESSAGE_NUM, this.paidMessages.length - MAX_PAID_MESSAGE_NUM)
         }
       }
+
+      // 不知道cloneDeep拷贝Vue的响应式对象会不会有问题，保险起见把这句放在后面
+      this.messagesBuffer.push(message)
     },
     handleDelMessage({ id }) {
-      for (let arr of [this.messages, this.paidMessages, this.messagesBuffer]) {
+      let arrs = [this.messages, this.paidMessages, this.messagesBuffer]
+      let needResetSmoothScroll = false
+      for (let arr of arrs) {
         for (let i = 0; i < arr.length; i++) {
-          if (arr[i].id === id) {
-            arr.splice(i, 1)
-            this.resetSmoothScroll()
-            break
+          if (arr[i].id !== id) {
+            continue
           }
+          arr.splice(i, 1)
+          if (arr === this.messages) {
+            needResetSmoothScroll = true
+          }
+          break
         }
+      }
+      if (needResetSmoothScroll) {
+        this.resetSmoothScroll()
       }
     },
     handleUpdateMessage({ id, newValuesObj }) {
-      // 遍历滚动的消息
-      this.forEachRecentMessage(999999999, message => {
-        if (message.id !== id) {
-          return true
+      let arrs = [this.messages, this.paidMessages, this.messagesBuffer]
+      let needResetSmoothScroll = false
+      for (let arr of arrs) {
+        for (let message of arr) {
+          if (message.id !== id) {
+            continue
+          }
+          this.doUpdateMessage(message, newValuesObj)
+          if (arr === this.messages) {
+            needResetSmoothScroll = true
+          }
+          break
         }
-        for (let name in newValuesObj) {
-          message[name] = newValuesObj[name]
-        }
-        return false
-      })
-      // 遍历固定的消息
-      for (let message of this.paidMessages) {
-        if (message.id !== id) {
-          continue
-        }
-        for (let name in newValuesObj) {
-          message[name] = newValuesObj[name]
-        }
-        break
       }
-      this.resetSmoothScroll()
+      if (needResetSmoothScroll) {
+        this.resetSmoothScroll()
+      }
+    },
+    doUpdateMessage(message, newValuesObj) {
+      // +=
+      let addValuesObj = newValuesObj.$add
+      if (addValuesObj !== undefined) {
+        for (let name in addValuesObj) {
+          message[name] += addValuesObj[name]
+        }
+      }
+
+      // =
+      for (let name in newValuesObj) {
+        if (!name.startsWith('$')) {
+          message[name] = newValuesObj[name]
+        }
+      }
     },
 
     async flushMessagesBuffer() {
@@ -544,6 +579,7 @@ export default {
 
     maybeResizeScrollContainer() {
       this.$refs.itemOffset.style.height = `${this.$refs.items.clientHeight}px`
+      this.$refs.itemOffset.style.minHeight = `${this.$refs.scroller.clientHeight}px`
       this.maybeScrollToBottom()
     },
     maybeScrollToBottom() {

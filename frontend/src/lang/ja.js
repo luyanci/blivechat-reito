@@ -3,15 +3,22 @@ export default {
     home: 'トップページ',
     stylegen: 'スタイルジェネレータ',
     help: 'ヘルプ',
+    plugins: 'プラグイン',
+    links: 'リンク',
     projectAddress: 'プロジェクトアドレス',
-    giftRecordOfficial: '公式スーパーチャット記録',
+    discussion: '議論',
+    documentation: 'ドキュメンテーション',
+    mall: 'モール',
+    giftRecordOfficial: 'スーパーチャット記録',
   },
   home: {
     roomIdEmpty: 'ルームのIDを空白にすることはできません',
     roomIdInteger: 'ルームは正の整数でなければなりません',
     authCodeEmpty: 'アイデンティティコードを空白にすることはできません',
     authCodeFormatError: 'アイデンティティコードの形式エラー',
-    useAuthCodeWarning: 'アイデンティティコードを優先的に使用してください',
+
+    unavailableWhenUsingAuthCode: '非推奨です。アイデンティティコードを使用する際に利用できません',
+    disabledByServer: 'サーバーによって無効にされました',
 
     logout: 'ログアウト',
     startLogin: 'ログインを開始',
@@ -21,8 +28,9 @@ export default {
     useLoaderUrl: 'ローダーURLを使用する',
 
     general: '常規',
+    useAuthCodeWarning: 'アイデンティティコードを優先的に使用してください。そうしないと、アイコンやユーザー名が表示されません',
     room: 'ルーム',
-    roomId: 'ルームID',
+    roomId: 'ルームID（推奨されません）',
     authCode: 'アイデンティティコード',
     howToGetAuthCode: 'アイデンティティコードの取得方法',
     showDanmaku: 'コメントを表示する',
@@ -45,12 +53,18 @@ export default {
     blockMedalLevel: 'ブロック勲章等級がx未満',
 
     advanced: 'アドバンスド',
+    showDebugMessages: 'デバッグメッセージを表示する',
+    showDebugMessagesTip: 'メッセージが表示されない場合、デバッグのためにこれを有効にすることができます。それ以外の場合は、有効にする必要はありません',
     relayMessagesByServer: 'サーバを介してメッセージを転送する',
-    autoTranslate: 'コメントを日本語に翻訳する（サーバを介してメッセージを転送する必要）',
+    relayMessagesByServerTip: '有効になった場合のメッセージパス：Bilibiliサーバー -> blivechatサーバー -> あなたのブラウザー。一部の高度な機能では、これが有効になっている必要があります。blivechatをローカルで使用する場合にのみ有効にすることを推奨します。リモートサーバーを介して使用する場合には、有効にしないようにしてください',
+    autoTranslate: 'コメントを日本語に翻訳する',
+    requiresRelayMessagesByServer: 'サーバを介してメッセージを転送する必要',
     giftUsernamePronunciation: 'スーパーチャットのユーザー名の発音',
     dontShow: '非表示',
     pinyin: 'ピンイン',
     kana: '仮名',
+    importPresetCss: 'サーバープリセットのCSSをインポートする',
+    importPresetCssTip: 'サーバーのCSSファイル「data/custom_public/preset.css」を自動的にインポートする',
 
     emoticon: 'カスタムスタンプ',
     emoticonKeyword: '置き換えるキーワード',
@@ -60,9 +74,10 @@ export default {
     emoticonFileTooLarge: 'ファイルサイズが大きすぎます。最大サイズは1MBです',
 
     urlTooLong: 'ルームのURLが長すぎて、直播姬によって切り詰められます（ただし、OBSでは切り詰められません）',
+    roomUrlUpdated: 'ルームのURLが更新されました。再度コピーすることをお忘れなく',
     roomUrl: 'ルームのURL',
     enterRoom: 'ルームに入る',
-    enterTestRoom: 'テストルームに入る',
+    copyTestRoomUrl: 'テストルームのURLをコピーする',
     exportConfig: 'コンフィグの導出',
     importConfig: 'コンフィグの導入',
 
@@ -70,7 +85,7 @@ export default {
   },
   stylegen: {
     legacy: '古典',
-    lineLike: 'Line風',
+    lineLike: 'LINE風',
 
     light: '明るい',
     dark: '暗い',
@@ -87,6 +102,10 @@ export default {
     userNames: 'ユーザー名',
     showUserNames: 'ユーザー名を表示する',
     font: 'フォント',
+    fontSelectTip: 'ローカルフォント名も入力することができます。最初にランク付けされたフォントが最初に使用されます',
+    recentFonts: '最近のフォント',
+    presetFonts: 'プリセットフォント',
+    networkFonts: 'ネットワークフォント',
     fontSize: 'フォントサイズ',
     lineHeight: '行の高さ（0はデフォルト）',
     normalColor: 'ノーマルの色',
@@ -96,6 +115,7 @@ export default {
     showBadges: '勲章を見せる',
     showColon: 'ユーザー名の後にコロンが表示されます',
     emoticonSize: 'スタンプサイズ',
+    largeEmoticonSize: '大きなスタンプサイズ',
 
     messages: 'コメント',
     color: '色',
@@ -107,6 +127,7 @@ export default {
     backgrounds: '背景',
     bgColor: '背景色',
     useBarsInsteadOfBg: '背景に代わります',
+    showLargeEmoticonBg: '大きなスタンプの背景を表示する',
     messageBgColor: 'コメント背景色',
     ownerMessageBgColor: 'オーナーコメント背景色',
     moderatorMessageBgColor: '管理者コメント背景色',
@@ -141,6 +162,7 @@ export default {
 
     result: '結果',
     copy: 'コピー',
+    editor: 'エディタ',
     resetConfig: 'デフォルトに戻す'
   },
   help: {
@@ -152,6 +174,9 @@ export default {
     p4: '4. OBSでブラウザを新規作成する',
     p5: '5. プロパティでこぴーしたURLを入力し、カスタムCSSでスタイルジェネレータのCSSを入力する'
   },
+  room: {
+    fatalErrorOccurred: '致命的なエラーが発生しました。ページを手動で更新して再接続してください'
+  },
   chat: {
     moderator: 'モデレーター',
     guardLevel1: '総督',
@@ -160,5 +185,26 @@ export default {
     sendGift: '{giftName}x{num} を贈りました',
     membershipTitle: '新規メンバー',
     tickerMembership: 'メンバー'
-  }
+  },
+  plugins: {
+    plugins: 'プラグイン',
+    help: 'ヘルプ',
+    helpContent: `\
+<p>プラグインは、メッセージの記録、テキスト読み上げ、曲リクエストなど、blivechatにさらなる機能を追加できます。
+  プラグインはサードパーティの作者によって開発される場合があり、セキュリティと品質はプラグイン作者の責任です。
+  いくつかの公開されたプラグインは<a target="_blank" href="https://github.com/xfgryujk/blivechat/discussions/categories/%E6%8F%92%E4%BB%B6"
+  >GitHub Discussions</a>で見つけることができます</p>
+<p>プラグインのインストール方法：抽出されたプラグインディレクトリを「data/plugins」ディレクトリに配置し、blivechatを再起動します</p>
+<p>注意：ほとんどのプラグインは、「サーバを介してメッセージを転送する」オプションを有効にし、メッセージを受信するために
+  ルームに接続する必要があります</p>
+<p><a target="_blank" href="https://www.bilibili.com/video/BV1nZ42187TX/">紹介動画</a></p>
+<p><a target="_blank" href="https://github.com/xfgryujk/blivechat/wiki/%E6%8F%92%E4%BB%B6%E7%B3%BB%E7%BB%9F"
+  >プラグイン開発ドキュメント</a></p>
+`,
+    author: '作者：',
+    disabledByServer: 'プラグインの管理は、サーバーによって無効にされています',
+    admin: '管理',
+    connected: '接続済み',
+    unconnected: '未接続',
+  },
 }

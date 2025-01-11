@@ -2,6 +2,7 @@ import { BrotliDecode } from './brotli_decode'
 import { inflate } from 'pako'
 
 import * as chat from '..'
+import * as chatModels from '../models'
 
 const HEADER_SIZE = 16
 
@@ -45,18 +46,12 @@ export default class ChatClientOfficialBase {
   constructor() {
     this.CMD_CALLBACK_MAP = {}
 
-    this.onAddText = null
-    this.onAddGift = null
-    this.onAddMember = null
-    this.onAddSuperChat = null
-    this.onDelSuperChat = null
-    this.onUpdateTranslation = null
-
-    this.onFatalError = null
+    this.msgHandler = chat.getDefaultMsgHandler()
 
     this.needInitRoom = true
     this.websocket = null
     this.retryCount = 0
+    this.totalRetryCount = 0
     this.isDestroying = false
     this.heartbeatTimerId = null
     this.receiveTimeoutTimerId = null
@@ -74,28 +69,37 @@ export default class ChatClientOfficialBase {
   }
 
   async initRoom() {
-    throw Error('Not implemented')
+    throw new Error('Not implemented')
   }
 
   makePacket(data, operation) {
-    let body
     if (typeof data === 'object') {
-      body = textEncoder.encode(JSON.stringify(data))
-    } else { // string
-      body = textEncoder.encode(data)
+      data = JSON.stringify(data)
     }
-    let header = new ArrayBuffer(HEADER_SIZE)
-    let headerView = new DataView(header)
-    headerView.setUint32(0, HEADER_SIZE + body.byteLength)   // pack_len
-    headerView.setUint16(4, HEADER_SIZE)                     // raw_header_size
-    headerView.setUint16(6, 1)                               // ver
-    headerView.setUint32(8, operation)                       // operation
-    headerView.setUint32(12, 1)                              // seq_id
-    return new Blob([header, body])
+    let bodyArr = textEncoder.encode(data)
+
+    let headerBuf = new ArrayBuffer(HEADER_SIZE)
+    let headerView = new DataView(headerBuf)
+    headerView.setUint32(0, HEADER_SIZE + bodyArr.byteLength)  // pack_len
+    headerView.setUint16(4, HEADER_SIZE)                       // raw_header_size
+    headerView.setUint16(6, 1)                                 // ver
+    headerView.setUint32(8, operation)                         // operation
+    headerView.setUint32(12, 1)                                // seq_id
+
+    // 这里如果直接返回 new Blob([headerBuf, bodyArr])，在Chrome抓包会显示空包，实际上是有数据的，为了调试体验最好还是拷贝一遍
+    let headerArr = new Uint8Array(headerBuf)
+    let packetArr = new Uint8Array(bodyArr.length + headerArr.length)
+    packetArr.set(headerArr)
+    packetArr.set(bodyArr, headerArr.length)
+    return packetArr
   }
 
   sendAuth() {
-    throw Error('Not implemented')
+    throw new Error('Not implemented')
+  }
+
+  addDebugMsg(content) {
+    this.msgHandler.onDebugMsg(new chatModels.DebugMsg({ content }))
   }
 
   async wsConnect() {
@@ -103,6 +107,7 @@ export default class ChatClientOfficialBase {
       return
     }
 
+    this.addDebugMsg('Connecting')
     await this.onBeforeWsConnect()
     if (this.isDestroying) {
       return
@@ -126,25 +131,30 @@ export default class ChatClientOfficialBase {
     } catch (e) {
       res = false
       console.error('initRoom exception:', e)
-      if (e instanceof chat.ChatClientFatalError && this.onFatalError) {
-        this.onFatalError(e)
+      if (e instanceof chatModels.ChatClientFatalError) {
+        this.stop()
+        this.msgHandler.onFatalError(e)
       }
     }
 
     if (!res) {
-      this.onWsClose()
-      throw Error('initRoom failed')
+      window.setTimeout(() => this.onWsClose(), 0)
+      throw new Error('initRoom failed')
     }
     this.needInitRoom = false
   }
 
   getWsUrl() {
-    throw Error('Not implemented')
+    throw new Error('Not implemented')
   }
 
   onWsOpen() {
+    this.addDebugMsg('Connected and authenticating')
+
     this.sendAuth()
-    this.heartbeatTimerId = window.setInterval(this.sendHeartbeat.bind(this), HEARTBEAT_INTERVAL)
+    if (this.heartbeatTimerId === null) {
+      this.heartbeatTimerId = window.setInterval(this.sendHeartbeat.bind(this), HEARTBEAT_INTERVAL)
+    }
     this.refreshReceiveTimeoutTimer()
   }
 
@@ -161,6 +171,8 @@ export default class ChatClientOfficialBase {
 
   onReceiveTimeout() {
     console.warn('接收消息超时')
+    this.addDebugMsg('Receiving message timed out')
+
     this.discardWebsocket()
   }
 
@@ -170,13 +182,19 @@ export default class ChatClientOfficialBase {
       this.receiveTimeoutTimerId = null
     }
 
-    // 直接丢弃阻塞的websocket，不等onclose回调了
-    this.websocket.onopen = this.websocket.onclose = this.websocket.onmessage = null
-    this.websocket.close()
-    this.onWsClose()
+    if (this.websocket) {
+      if (this.websocket.onclose) {
+        window.setTimeout(() => this.onWsClose(), 0)
+      }
+      // 直接丢弃阻塞的websocket，不等onclose回调了
+      this.websocket.onopen = this.websocket.onclose = this.websocket.onmessage = null
+      this.websocket.close()
+    }
   }
 
   onWsClose() {
+    this.addDebugMsg('Disconnected')
+
     this.websocket = null
     if (this.heartbeatTimerId) {
       window.clearInterval(this.heartbeatTimerId)
@@ -191,15 +209,47 @@ export default class ChatClientOfficialBase {
       return
     }
     this.retryCount++
-    console.warn('掉线重连中', this.retryCount)
-    window.setTimeout(this.wsConnect.bind(this), this.getReconnectInterval())
+    this.totalRetryCount++
+    console.warn(`掉线重连中 retryCount=${this.retryCount}, totalRetryCount=${this.totalRetryCount}`)
+
+    // 防止无限重连的保险措施。30次重连大概会断线500秒，应该够了
+    if (this.totalRetryCount > 30) {
+      this.stop()
+      let error = new chatModels.ChatClientFatalError(
+        chatModels.FATAL_ERROR_TYPE_TOO_MANY_RETRIES, 'The connection has lost too many times'
+      )
+      this.msgHandler.onFatalError(error)
+      return
+    }
+
+    this.delayReconnect()
+  }
+
+  delayReconnect() {
+    this.addDebugMsg(`Scheduling reconnection. The page is ${document.visibilityState === 'visible' ? 'visible' : 'invisible'}`)
+
+    if (document.visibilityState === 'visible') {
+      window.setTimeout(this.wsConnect.bind(this), this.getReconnectInterval())
+      return
+    }
+
+    // 页面不可见就先不重连了，即使重连也会心跳超时
+    let listener = () => {
+      if (document.visibilityState !== 'visible') {
+        return
+      }
+      document.removeEventListener('visibilitychange', listener)
+      this.wsConnect()
+    }
+    document.addEventListener('visibilitychange', listener)
   }
 
   getReconnectInterval() {
-    return Math.min(
-      1000 + ((this.retryCount - 1) * 2000),
-      10 * 1000
-    )
+    // 不用retryCount了，防止意外的连接成功，导致retryCount重置
+    let interval = Math.min(1000 + ((this.totalRetryCount - 1) * 2000), 20 * 1000)
+    // 加上随机延迟，防止同时请求导致雪崩
+    interval += Math.random() * 3000
+    return interval
   }
 
   onWsMessage(event) {

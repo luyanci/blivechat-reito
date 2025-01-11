@@ -3,8 +3,13 @@ export default {
     home: 'Home',
     stylegen: 'Style Generator',
     help: 'Help',
+    plugins: 'Plugins',
+    links: 'Links',
     projectAddress: 'Project Address',
-    giftRecordOfficial: 'Official Super Chat Record',
+    discussion: 'Discussions',
+    documentation: 'Documentation',
+    mall: 'Mall',
+    giftRecordOfficial: 'Super Chat Records',
   },
   home: {
     roomIdEmpty: "Room ID can't be empty",
@@ -19,10 +24,12 @@ export default {
     isLoginFalse: 'Not logged in',
     useSecondaryScanCode: 'To ensure account security, please use the secondary account for scan code login',
     useLoaderUrl: 'Use loader url',
+    unavailableWhenUsingAuthCode: 'Deprecated. Unavailable when using identity code',
+    disabledByServer: 'Disabled by the server',
 
     general: 'General',
     room: 'Room',
-    roomId: 'Room ID',
+    roomId: 'Room ID (not recommended)',
     authCode: 'Identity code',
     howToGetAuthCode: 'How to get identity code',
     showDanmaku: 'Show messages',
@@ -45,12 +52,18 @@ export default {
     blockMedalLevel: 'Block medal level lower than',
 
     advanced: 'Advanced',
-    relayMessagesByServer: 'Relay messages by server',
-    autoTranslate: 'Auto translate messages to Japanese (requires relay messages by server)',
+    showDebugMessages: 'Show debug messages',
+    showDebugMessagesTip: 'If the messages cannot be displayed, you can enable this for debugging. Otherwise there is no need to enable it',
+    relayMessagesByServer: 'Relay messages by the server',
+    relayMessagesByServerTip: 'Message path when enabled: Bilibili server -> blivechat server -> your browser. Some advanced features require this to be enabled. It is recommended to enable it only when using blivechat locally, and not when using through a remote server',
+    autoTranslate: 'Auto translate messages to Japanese',
+    requiresRelayMessagesByServer: 'Requires relay messages by the server',
     giftUsernamePronunciation: 'Pronunciation of gift username',
     dontShow: 'None',
     pinyin: 'Pinyin',
     kana: 'Kana',
+    importPresetCss: 'Import the server preset CSS',
+    importPresetCssTip: 'Automatically import the server CSS file: data/custom_public/preset.css',
 
     emoticon: 'Custom Emotes',
     emoticonKeyword: 'Emote Code',
@@ -60,9 +73,10 @@ export default {
     emoticonFileTooLarge: 'File size is too large. Max size is 1MB',
 
     urlTooLong: 'The room URL is too long, and will be truncated by Livehime (but not by OBS)',
+    roomUrlUpdated: 'The room URL is updated. Remember to copy it again',
     roomUrl: 'Room URL',
     enterRoom: 'Enter room',
-    enterTestRoom: 'Enter test room',
+    copyTestRoomUrl: 'Copy test room URL',
     exportConfig: 'Export config',
     importConfig: 'Import config',
 
@@ -70,7 +84,7 @@ export default {
   },
   stylegen: {
     legacy: 'Classic',
-    lineLike: 'Line-like',
+    lineLike: 'LINE-like',
 
     light: 'light',
     dark: 'dark',
@@ -87,6 +101,10 @@ export default {
     userNames: 'User Names',
     showUserNames: 'Show user names',
     font: 'Font',
+    fontSelectTip: 'You can also input local font name. Fonts ranked first will be used first',
+    recentFonts: 'Recent fonts',
+    presetFonts: 'Preset fonts',
+    networkFonts: 'Network fonts',
     fontSize: 'Font size',
     lineHeight: 'Line height (0 for default)',
     normalColor: 'Normal color',
@@ -96,6 +114,7 @@ export default {
     showBadges: 'Show badges',
     showColon: 'Show colon after name',
     emoticonSize: 'Emoticon size',
+    largeEmoticonSize: 'Large emoticon size',
 
     messages: 'Messages',
     color: 'Color',
@@ -107,6 +126,7 @@ export default {
     backgrounds: 'Backgrounds',
     bgColor: 'Background color',
     useBarsInsteadOfBg: 'Use bars instead of backgrounds',
+    showLargeEmoticonBg: 'Show large emoticon background',
     messageBgColor: 'Message background color',
     ownerMessageBgColor: 'Owner background color',
     moderatorMessageBgColor: 'Moderator background color',
@@ -141,6 +161,7 @@ export default {
 
     result: 'Result',
     copy: 'Copy',
+    editor: 'Editor',
     resetConfig: 'Reset config'
   },
   help: {
@@ -152,6 +173,9 @@ export default {
     p4: '4. Add browser source in OBS',
     p5: '5. Enter the previously copied room URL at URL, and enter the previously copied CSS at custom CSS'
   },
+  room: {
+    fatalErrorOccurred: 'A fatal error has occurred. Please manually refresh the page to reconnect'
+  },
   chat: {
     moderator: 'moderator',
     guardLevel1: 'governor',
@@ -160,5 +184,26 @@ export default {
     sendGift: 'Sent {giftName}x{num}',
     membershipTitle: 'New member',
     tickerMembership: 'Member'
-  }
+  },
+  plugins: {
+    plugins: 'Plugins',
+    help: 'Help',
+    helpContent: `\
+<p>Plugins can add more functionality to blivechat, such as message logging, text to speech, song requests, etc. Plugins may
+  be developed by third-party authors, and the security and quality are the responsibility of the plugin author. You can
+  find some published plugins in <a target="_blank" href="https://github.com/xfgryujk/blivechat/discussions/categories/%E6%8F%92%E4%BB%B6"
+  >GitHub Discussions</a></p>
+<p>Plugin installation method: Put the extracted plugin directory into the "data/plugins" directory, then restart blivechat</p>
+<p>Notes: Most plugins require enabling the "Relay messages by the server" option and connecting to the room
+  in order to receive messages</p>
+<p><a target="_blank" href="https://www.bilibili.com/video/BV1nZ42187TX/">Introducing video</a></p>
+<p><a target="_blank" href="https://github.com/xfgryujk/blivechat/wiki/%E6%8F%92%E4%BB%B6%E7%B3%BB%E7%BB%9F">
+  Plugin development documentation</a></p>
+`,
+    author: 'Author: ',
+    disabledByServer: 'Administration for plugins is disabled by the server',
+    admin: 'Admin',
+    connected: 'Connected',
+    unconnected: 'Unconnected',
+  },
 }
