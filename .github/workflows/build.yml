@@ -87,6 +87,8 @@ jobs:
             --add-data="data;data" `
             --add-data="log;log" `
             --add-data="frontend\dist;frontend\dist" `
+            --hidden-import aiohttp `
+            --hidden-import PIL `
             --name blivechat `
             main.py
       - name: Package Bundle
