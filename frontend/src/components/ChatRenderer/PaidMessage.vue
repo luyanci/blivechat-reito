@@ -1,13 +1,13 @@
 <template>
   <yt-live-chat-paid-message-renderer class="style-scope yt-live-chat-item-list-renderer" allow-animations
     :show-only-header="!content" :style="{
-      '--yt-live-chat-paid-message-secondary-color': priceRange.colors.headerBg,
-      '--yt-live-chat-paid-message-primary-color': priceRange.colors.contentBg,
-      '--yt-live-chat-paid-message-divider-color': priceRange.colors.dividerColor,
-      '--yt-live-chat-paid-message-header-color': priceRange.colors.header,
-      '--yt-live-chat-paid-message-author-name-color': priceRange.colors.authorName,
-      '--yt-live-chat-paid-message-timestamp-color': priceRange.colors.time,
-      '--yt-live-chat-paid-message-color': priceRange.colors.content
+      '--yt-live-chat-paid-message-secondary-color': color.headerBg,
+      '--yt-live-chat-paid-message-primary-color': color.contentBg,
+      '--yt-live-chat-paid-message-divider-color': color.dividerColor,
+      '--yt-live-chat-paid-message-header-color': color.header,
+      '--yt-live-chat-paid-message-author-name-color': color.authorName,
+      '--yt-live-chat-paid-message-timestamp-color': color.time,
+      '--yt-live-chat-paid-message-color': color.content
     }"
     :price-level="priceConfig.priceLevel"
   >
