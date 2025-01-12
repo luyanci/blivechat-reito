@@ -6,7 +6,7 @@
 
 只熊KUMA版的请看 [bear-qrcode-ycc 分支](https://github.com/luyanci/blivechat-reito/tree/bear-qrcode-ycc)
 
-添加只熊版blc的dom节点的请看 [orig-qrcode-re-dom 分支](https://github.com/luyanci/blivechat-reito/tree/orig-qrcode-re-dom)
+原版的请看 [orig-qrcode-re 分支](https://github.com/luyanci/blivechat-reito/tree/orig-qrcode-re)
 
 ## 声明
 
@@ -21,7 +21,7 @@
 ## 打包
 
 ```shell
-git clone --recursive https://github.com/luyanci/blivechat-reito.git -b orig-qrcode-re
+git clone --recursive https://github.com/luyanci/blivechat-reito.git -b orig-qrcode-re-dom
 
 cd frontend
 npm i
