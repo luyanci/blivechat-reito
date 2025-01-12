@@ -68,7 +68,9 @@ export default {
     richContent: Array,
     medalLevel: Number,
     privilegeType: Number,
-    repeated: Number
+    repeated: Number,
+    isFanGroup: Boolean,
+    isDelete: Boolean
   },
   data() {
     return {
