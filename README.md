@@ -2,7 +2,11 @@
 
 支持扫码登录的 blivechat， 避免身份码（开放平台）部分信息缺失。
 
-只熊KUMA版的请看 [bear-reito 分支](https://github.com/cnSchwarzer/blivechat-reito/tree/bear-reito)
+本fork添加了简单的回复弹幕显示（@弹幕）
+
+只熊KUMA版的请看 [bear-qrcode-ycc 分支](https://github.com/luyanci/blivechat-reito/tree/bear-qrcode-ycc)
+
+添加只熊版blc的dom节点的请看 [orig-qrcode-re-dom 分支](https://github.com/luyanci/blivechat-reito/tree/orig-qrcode-re-dom)
 
 ## 声明
 
@@ -10,14 +14,14 @@
 
 ## 下载
 
-[前往下载](https://github.com/cnSchwarzer/blivechat-reito/releases/tag/release)
+[前往下载](https://github.com/luyanci/blivechat-reito/releases/tag/release)
 
 记得复制原作者的发行版中部分资源文件，如 `data/emoticons` 或其他 `frontend` 中需要使用的样式资源文件
 
 ## 打包
 
 ```shell
-git clone --recursive https://github.com/cnSchwarzer/blivechat-reito.git -b orig-reito
+git clone --recursive https://github.com/luyanci/blivechat-reito.git -b orig-qrcode-re
 
 cd frontend
 npm i
