@@ -4,6 +4,8 @@
 
 本fork添加了简单的回复弹幕显示（@弹幕）(**只熊kuma版**除外，不好合并)
 
+这条分支添加了只熊blc的dom节点（不稳定，有BUG请提issue!)
+
 只熊KUMA版的请看 [bear-qrcode-ycc 分支](https://github.com/luyanci/blivechat-reito/tree/bear-qrcode-ycc)
 
 原版的请看 [orig-qrcode-re 分支](https://github.com/luyanci/blivechat-reito/tree/orig-qrcode-re)
