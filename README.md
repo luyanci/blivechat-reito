@@ -2,7 +2,7 @@
 
 支持扫码登录的 blivechat， 避免身份码（开放平台）部分信息缺失。
 
-本fork添加了简单的回复弹幕显示（@弹幕）
+本fork添加了简单的回复弹幕显示（@弹幕）(**只熊kuma版**除外，不好合并)
 
 只熊KUMA版的请看 [bear-qrcode-ycc 分支](https://github.com/luyanci/blivechat-reito/tree/bear-qrcode-ycc)
 
