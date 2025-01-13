@@ -10,8 +10,8 @@ jobs:
         name: Push to ghcr.io
         runs-on: ubuntu-latest
         env:
-            image: ghcr.io/${{github.actor}}/blivechat-${{github.ref_name}}:latest
-            common-image: ghcr.io/${{github.actor}}/blivechat-common-${{github.ref_name}}:latest
+            image: ghcr.io/${{github.actor}}/blivechat:${{github.ref_name}}
+            common-image: ghcr.io/${{github.actor}}/blivechat-common:${{github.ref_name}}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
