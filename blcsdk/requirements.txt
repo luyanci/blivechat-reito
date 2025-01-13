@@ -1,2 +1,2 @@
-aiohttp~=3.9.0
+aiohttp~=3.11.11
 pyinstaller~=5.13.2
