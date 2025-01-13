@@ -2,6 +2,7 @@ name: Build
 
 on:
   push:
+    branches: ["orig-qrcode-re","orig-qrcode-re-dom","bear-qrcode-ycc"]
   workflow_dispatch:
 
 concurrency:
