@@ -2,6 +2,7 @@ name: Build
 
 on:
   push:
+    branches: ["orig-qrcode-re","orig-qrcode-re-dom","bear-qrcode-ycc"]
   workflow_dispatch:
 
 concurrency:
@@ -112,7 +113,7 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: release
           body: 'bear: 基于只熊KUMA
