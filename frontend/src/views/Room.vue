@@ -942,6 +942,12 @@ export default {
         this.config.imageShowType = 1
       }
 
+      if (data.replyUname.length > 0) {
+        richContent.push({
+          type: constants.CONTENT_TYPE_AT,
+          uname: data.replyUname
+        })
+      }
       // 翻译弹幕，只显示文字
       if (this.config.showTranslateDanmakuOnly == true) {
         richContent.push(this.generateTextData(data.content, textColor))
@@ -1059,13 +1065,6 @@ export default {
           type: constants.CONTENT_TYPE_TEXT,
           text: data.content.slice(startPos, pos),
           textColor: textColor
-        })
-      }
-
-      if (data.replyUname.length > 0) {
-        richContent.push({
-          type: constants.CONTENT_TYPE_AT,
-          uname: data.replyUname
         })
       }
 
