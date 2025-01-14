@@ -39,8 +39,7 @@
             <!-- 直接替换表情包 -->
             <div id='image-and-message' class="style-scope yt-live-chat-text-message-renderer">
               <template v-for="(content, contentIndex) in richContent">
-                                <span :key="contentIndex" v-if="content.type === CONTENT_TYPE_AT">@{{ content.uname }}</span>
-                <span :key="contentIndex" v-else-if="content.type === CONTENT_TYPE_TEXT" id="message" class="style-scope yt-live-chat-text-message-renderer"
+                <span :key="contentIndex" v-if="content.type === CONTENT_TYPE_TEXT" id="message" class="style-scope yt-live-chat-text-message-renderer"
                   display="block"
                   :style="`
                     ${content.textColor === 'initial' ? '' : `color: ${content.textColor} !important;`};`"
