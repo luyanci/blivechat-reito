@@ -464,6 +464,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             content_type_params=content_type_params,
             # 给插件用的字段
             uid=str(message.uid) if message.uid != 0 else message.uname,
+            reply_uname='' if len(message.reply_uname) == 0 else message.reply_uname,
         ))
 
         if need_translate:

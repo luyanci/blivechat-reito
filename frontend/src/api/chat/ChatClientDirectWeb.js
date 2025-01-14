@@ -111,6 +111,7 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
       id: getUuid4Hex(),
       translation: '',
       emoticon: info[0][13].url || null,
+      replyUname: '',
     }
     // 增加区分表情的细节数据
     if (info[0][13]) {

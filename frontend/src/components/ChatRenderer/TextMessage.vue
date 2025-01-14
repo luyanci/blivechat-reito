@@ -121,6 +121,7 @@
                   :height="content.height"
                   width="auto"
                 >
+                <span :key="index" v-else-if="content.type === CONTENT_TYPE_AT">@{{ content.uname }}</span>
               </template>
               <el-badge :value="getRepeatedValue(richContentIndex)" :max="99" v-show="getRepeatedValue(richContentIndex) > 1" class="style-scope yt-live-chat-text-message-renderer"
                 :style="{ '--repeated-mark-color': repeatedMarkColor }"
@@ -154,7 +155,8 @@ export default {
     return {
       CONTENT_TYPE_TEXT: constants.CONTENT_TYPE_TEXT,
       CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE,
-      CONTENT_TYPE_EMOTICON: constants.CONTENT_TYPE_EMOTICON
+      CONTENT_TYPE_EMOTICON: constants.CONTENT_TYPE_EMOTICON,
+      CONTENT_TYPE_AT: constants.CONTENT_TYPE_AT
     }
   },
   components: {

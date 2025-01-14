@@ -184,6 +184,7 @@ export default class ChatClientDirectOpenLive extends ChatClientOfficialBase {
       id: data.msg_id,
       translation: '',
       emoticon: emoticon,
+      replyUname: '',
     }
     this.onAddText(data)
   }

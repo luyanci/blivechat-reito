@@ -1061,6 +1061,14 @@ export default {
           textColor: textColor
         })
       }
+
+      if (data.replyUname.length > 0) {
+        richContent.push({
+          type: constants.CONTENT_TYPE_AT,
+          uname: data.replyUname
+        })
+      }
+
       return richContent
     },
     async fillImageContentSizes(richContent) {
