@@ -5,5 +5,5 @@ Pillow==11.1.0
 pycryptodome==3.19.1
 qrcode==8.0
 SQLAlchemy==2.0.37
-tornado==6.4.1
+tornado==6.4.2
 typing_extensions==4.8.0
