@@ -992,7 +992,20 @@ export default {
       let has_user_defined_danmu_pic = this.danmu_pic_json.length !== 0
       let has_bilibili_official_small_emoji = this.textEmoticons.length !== 0
 
+      if (data.replyUname.length > 0) {
+        richContent.push({
+          type: constants.CONTENT_TYPE_AT,
+          uname: data.replyUname
+        })
+      }
+
       if (!has_blivechat_emoticon && !has_user_defined_danmu_pic && !has_bilibili_official_small_emoji) {
+        if (data.replyUname.length > 0) {
+          richContent.push({
+            type: constants.CONTENT_TYPE_AT,
+            uname: data.replyUname
+          })
+        }
         // 只能是文本（没有blivechat自定义表情, 没有用户自定义文字转图片, 没有B站官方小表情）
         richContent.push(this.generateTextData(data.content, textColor))
         return richContent
@@ -1059,13 +1072,6 @@ export default {
           type: constants.CONTENT_TYPE_TEXT,
           text: data.content.slice(startPos, pos),
           textColor: textColor
-        })
-      }
-
-      if (data.replyUname.length > 0) {
-        richContent.push({
-          type: constants.CONTENT_TYPE_AT,
-          uname: data.replyUname
         })
       }
 
