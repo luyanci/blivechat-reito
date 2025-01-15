@@ -76,7 +76,7 @@ export default {
   data() {
     return {
       MESSAGE_TYPE_MEMBER: constants.MESSAGE_TYPE_MEMBER,
-
+      MESSAGE_TYPE_SUPER_CHAT: constants.MESSAGE_TYPE_SUPER_CHAT,
       curTime: new Date(),
       updateTimerId: window.setInterval(this.updateProgress, 1000),
       pinnedMessage: null
