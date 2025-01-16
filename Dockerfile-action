@@ -40,11 +40,6 @@ RUN mkdir -p "${EXT_DATA_PATH}/frontend/dist" \
 # 编译好的前端
 COPY --from=builder "${BASE_PATH}/frontend/dist" "${EXT_DATA_PATH}/frontend/dist/"
 
-# 补充数据
-RUN wget https://github.com/luyanci/blivechat-reito/releases/download/release/doodlebear-data.zip
-RUN 7z x doodlebear-data.zip -o. -y
-
-
 # 运行
 VOLUME "${EXT_DATA_PATH}"
 EXPOSE 12450
