@@ -92,11 +92,6 @@ jobs:
             --hidden-import PIL `
             --name blivechat `
             main.py
-      - name: Get extra data
-        run: |
-          wget https://github.com/luyanci/blivechat-reito/releases/download/release/doodlebear-data.zip
-          7z x doodlebear-data.zip -o./dist/blivechat -y
-
       - name: Package Bundle
         working-directory: dist
         run: 7z a -tzip blivechat-bear-${{ runner.os }}-${{ runner.arch }}.zip blivechat
