@@ -62,6 +62,12 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
   async danmuMsgCallback(command) {
     let info = command.info
 
+    let modeInfo = info[0][15]
+    let avatarUrl = modeInfo?.user?.base?.face ?? ''
+    if (!avatarUrl) {
+      avatarUrl = await chat.getAvatarUrl(uid, authorName)
+    }
+
     let roomId, medalLevel
     if (info[3]) {
       roomId = info[3][3]
@@ -84,14 +90,30 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
       authorType = 0
     }
 
-    let authorName = info[2][1]
+    let extra
+    try {
+      extra = modeInfo.extra
+      if (typeof extra !== 'object') {
+        extra = JSON.parse(extra)
+      }
+    } catch {
+      extra = {}
+    }
+
     let content = info[1]
+    let replyUname = extra.reply_uname ?? ''
+    let showContent = content
+    if (replyUname !== '') {
+      showContent = `@${replyUname} ${showContent}`
+    }
+
+    let authorName = info[2][1]
     let data = new chatModels.AddTextMsg({
-      avatarUrl: await chat.getAvatarUrl(uid, authorName),
+      avatarUrl: avatarUrl,
       timestamp: info[0][4] / 1000,
       authorName: authorName,
       authorType: authorType,
-      content: content,
+      content: showContent,
       privilegeType: privilegeType,
       isGiftDanmaku: Boolean(info[0][9]) || chat.isGiftDanmakuByContent(content),
       authorLevel: info[4][0],
@@ -118,13 +140,25 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
     this.msgHandler.onAddGift(data)
   }
 
-  async guardBuyCallback(command) {
+  async userToastV2Callback(command) {
     let data = command.data
+    let {
+      sender_uinfo: {
+        uid,
+        base: {
+          name: username,
+        },
+      },
+      guard_info: {
+        start_time: timestamp,
+        guard_level: guardLevel,
+      },
+    } = data
     data = new chatModels.AddMemberMsg({
-      avatarUrl: await chat.getAvatarUrl(data.uid, data.username),
-      timestamp: data.start_time,
-      authorName: data.username,
-      privilegeType: data.guard_level
+      avatarUrl: await chat.getAvatarUrl(uid, username),
+      timestamp: timestamp,
+      authorName: username,
+      privilegeType: guardLevel,
     })
     this.msgHandler.onAddMember(data)
   }
@@ -155,7 +189,7 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
 const CMD_CALLBACK_MAP = {
   DANMU_MSG: ChatClientDirectWeb.prototype.danmuMsgCallback,
   SEND_GIFT: ChatClientDirectWeb.prototype.sendGiftCallback,
-  GUARD_BUY: ChatClientDirectWeb.prototype.guardBuyCallback,
+  USER_TOAST_MSG_V2: ChatClientDirectWeb.prototype.userToastV2Callback,
   SUPER_CHAT_MESSAGE: ChatClientDirectWeb.prototype.superChatMessageCallback,
   SUPER_CHAT_MESSAGE_DELETE: ChatClientDirectWeb.prototype.superChatMessageDeleteCallback
 }

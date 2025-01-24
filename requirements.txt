@@ -3,6 +3,8 @@ cachetools==5.3.1
 circuitbreaker==2.0.0
 Pillow==11.1.0
 pycryptodome==3.19.1
+sqlalchemy==2.0.37
+tornado==6.4.2
 qrcode==8.0
 SQLAlchemy==2.0.37
 tornado==6.4.1
