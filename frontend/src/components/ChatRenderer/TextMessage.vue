@@ -30,8 +30,7 @@
               :width="content.width" :height="content.height"
               :class="{ 'blc-large-emoji': content.height >= 100 }"
             >
-            <span :key="index" v-else-if="content.type === CONTENT_TYPE_AT">@{{ content.uname }} </span>
-          </template>
+            </template>
           <el-badge :value="repeated" :max="99" v-if="repeated > 1"
             class="style-scope yt-live-chat-text-message-renderer"
             :style="{ '--repeated-mark-color': repeatedMarkColor }"></el-badge>
@@ -75,8 +74,7 @@ export default {
   data() {
     return {
       CONTENT_TYPE_TEXT: constants.CONTENT_TYPE_TEXT,
-      CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE,
-      CONTENT_TYPE_AT: constants.CONTENT_TYPE_AT,
+      CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE
     }
   },
   computed: {
@@ -114,13 +112,13 @@ export default {
 }
 </script>
 
-<style>
-yt-live-chat-text-message-renderer>#content .el-badge {
+<style scoped>
+#message >>> .el-badge {
   margin-left: 10px;
 }
 
-yt-live-chat-text-message-renderer>#content .el-badge .el-badge__content {
-  font-size: 14px !important;
+#message >>> .el-badge__content {
+  font-size: 12px !important;
   line-height: 18px !important;
   text-shadow: none !important;
   font-family: sans-serif !important;

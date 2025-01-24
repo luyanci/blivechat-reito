@@ -242,7 +242,7 @@ export default {
       let { type, data } = event.data
       switch (type) {
       case 'roomSetCustomStyle':
-        this.customStyleElement.innerText = data.css
+        this.customStyleElement.textContent = data.css
         break
       case 'roomStartClient':
         if (this.chatClient) {
@@ -453,13 +453,6 @@ export default {
         })
         await this.fillImageContentSizes(richContent)
         return richContent
-      }
-
-      if (data.replyUname.length > 0) {
-        richContent.push({
-          type: constants.CONTENT_TYPE_AT,
-          uname: data.replyUname,
-        })
       }
 
       // 没有文本表情，只能是纯文本

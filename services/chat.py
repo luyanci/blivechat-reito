@@ -508,7 +508,9 @@ class LiveMsgHandler(blivedm.BaseHandler):
 
     async def __on_danmaku(self, client: WebLiveClient, message: dm_web_models.DanmakuMessage):
         # 先异步调用再获取房间，因为返回时房间可能已经不存在了
-        avatar_url = await services.avatar.get_avatar_url(message.uid, message.uname)
+        avatar_url = message.face
+        if avatar_url == '':
+            avatar_url = await services.avatar.get_avatar_url(message.uid, message.uname)
 
         room = client_room_manager.get_room(client.room_key)
         if room is None:
@@ -522,6 +524,11 @@ class LiveMsgHandler(blivedm.BaseHandler):
             author_type = 1  # 舰队
         else:
             author_type = 0
+
+        show_content = message.msg
+        reply_uname = message.extra_dict.get('reply_uname', '')
+        if reply_uname != '':
+            show_content = f'@{reply_uname} {show_content}'
 
         if message.dm_type == 1:
             content_type = api.chat.ContentType.EMOTICON
@@ -551,7 +558,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             timestamp=int(message.timestamp / 1000),
             author_name=message.uname,
             author_type=author_type,
-            content=message.msg,
+            content=show_content,
             privilege_type=message.privilege_type,
             is_gift_danmaku=bool(message.msg_type),
             author_level=message.user_level,
@@ -564,7 +571,6 @@ class LiveMsgHandler(blivedm.BaseHandler):
             content_type_params=content_type_params,
             # 给插件用的字段
             uid=str(message.uid) if message.uid != 0 else message.uname,
-            reply_uname='' if len(message.reply_uname) == 0 else message.reply_uname,
             medal_name='' if message.medal_room_id != client.room_id else message.medal_name,
         )
         room.send_cmd_data(api.chat.Command.ADD_TEXT, data)
@@ -606,11 +612,11 @@ class LiveMsgHandler(blivedm.BaseHandler):
             sdk_models.Command.ADD_GIFT, data, make_plugin_msg_extra_from_live_client(client)
         )
 
-    def _on_buy_guard(self, client: WebLiveClient, message: dm_web_models.GuardBuyMessage):
+    def _on_user_toast_v2(self, client: WebLiveClient, message: dm_web_models.UserToastV2Message):
         utils.async_io.create_task_with_ref(self.__on_buy_guard(client, message))
 
     @staticmethod
-    async def __on_buy_guard(client: WebLiveClient, message: dm_web_models.GuardBuyMessage):
+    async def __on_buy_guard(client: WebLiveClient, message: dm_web_models.UserToastV2Message):
         # 先异步调用再获取房间，因为返回时房间可能已经不存在了
         avatar_url = await services.avatar.get_avatar_url(message.uid, message.username)
 
@@ -626,7 +632,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             'privilegeType': message.guard_level,
             # 给插件用的字段
             'num': message.num,
-            'unit': '月',  # 单位在USER_TOAST_MSG消息里，不想改消息。现在没有别的单位，web接口也很少有人用了，先写死吧
+            'unit': message.unit,
             'total_coin': message.price * message.num,
             'uid': str(message.uid) if message.uid != 0 else message.username,
             'medalLevel': 0,
@@ -736,10 +742,16 @@ class LiveMsgHandler(blivedm.BaseHandler):
 
         if message.open_id == client.room_owner_open_id:
             author_type = 3  # 主播
+        elif message.is_admin:
+            author_type = 2  # 房管
         elif message.guard_level != 0:  # 1总督，2提督，3舰长
             author_type = 1  # 舰队
         else:
             author_type = 0
+
+        show_content = message.msg
+        if message.reply_uname != '':
+            show_content = f'@{message.reply_uname} {show_content}'
 
         if message.dm_type == 1:
             content_type = api.chat.ContentType.EMOTICON
@@ -766,7 +778,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
             timestamp=message.timestamp,
             author_name=message.uname,
             author_type=author_type,
-            content=message.msg,
+            content=show_content,
             privilege_type=message.guard_level,
             medal_level=0 if not message.fans_medal_wearing_status else message.fans_medal_level,
             id_=message.msg_id,
@@ -792,7 +804,7 @@ class LiveMsgHandler(blivedm.BaseHandler):
         if room is None:
             return
 
-        total_coin = message.price * message.gift_num
+        total_coin = message.r_price * message.gift_num
         data = {
             'id': message.msg_id,
             'avatarUrl': services.avatar.process_avatar_url(message.uface),
