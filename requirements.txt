@@ -6,6 +6,4 @@ pycryptodome==3.19.1
 sqlalchemy==2.0.37
 tornado==6.4.2
 qrcode==8.0
-SQLAlchemy==2.0.37
-tornado==6.4.1
 typing_extensions==4.8.0
