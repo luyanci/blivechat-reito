@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: ["orig-qrcode-re","orig-qrcode-re-dom","bear-qrcode-ycc"]
+    branches: ["orig-qrcode-redev","orig-qrcode-redev-dom","bear-qrcode-ycc"]
   workflow_dispatch:
 
 concurrency:
@@ -115,7 +115,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: release
+          tag_name: release-dev
+          prerelease: true
           body: 'bear: 基于只熊KUMA
                  orig: 基于原版'
           files: ./**/blivechat-*.zip

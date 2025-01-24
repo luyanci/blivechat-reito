@@ -2,7 +2,7 @@ name: Push Docker image
 
 on:
     push:
-        branches: ["orig-qrcode-re","orig-qrcode-re-dom","bear-qrcode-ycc"]
+        branches: ["orig-qrcode-redev","orig-qrcode-redev-dom","bear-qrcode-ycc"]
     workflow_dispatch:
 
 jobs:
@@ -10,8 +10,8 @@ jobs:
         name: Push to ghcr.io
         runs-on: ubuntu-latest
         env:
-            image: ghcr.io/${{github.actor}}/blivechat:${{github.ref_name}}
-            common-image: ghcr.io/${{github.actor}}/blivechat-common:${{github.ref_name}}
+            image: ghcr.io/${{github.actor}}/blivechat-dev:${{github.ref_name}}
+            common-image: ghcr.io/${{github.actor}}/blivechat-dev-common:${{github.ref_name}}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
