@@ -23,6 +23,10 @@ const NAMES = [
   'Rick Astley',
 ]
 
+const MEDAL_NAME = [
+  '被炉', '轮椅人', '祈并者', '未川控', '棺材铺', '勋章名称', '勋章名称', '勋章名称', '白送了', '幻士', '玲喵'
+]
+
 const CONTENTS = [
   '草',
   '让我看看',
@@ -115,7 +119,9 @@ const MESSAGE_GENERATORS = [
           authorLevel: randInt(1, 60),
           isNewbie: randInt(1, 10) <= 1,
           isMobileVerified: randInt(1, 10) <= 9,
-          medalLevel: randInt(0, 40),
+          medalName: randomChoose(MEDAL_NAME),
+          medalLevel: randInt(1, 40),
+          isFanGroup: Boolean(Math.round(Math.random())),
         })
       }
     }
@@ -132,7 +138,9 @@ const MESSAGE_GENERATORS = [
           authorLevel: randInt(1, 60),
           isNewbie: randInt(1, 10) <= 1,
           isMobileVerified: randInt(1, 10) <= 9,
-          medalLevel: randInt(0, 40),
+          medalName: randomChoose(MEDAL_NAME),
+          medalLevel: randInt(1, 40),
+          isFanGroup: Boolean(Math.round(Math.random())),
           emoticon: randomChoose(EMOTICONS),
         })
       }

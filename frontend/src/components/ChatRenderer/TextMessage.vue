@@ -1,8 +1,14 @@
 <template>
-  <yt-live-chat-text-message-renderer :style="{
-    '--repeated-text-color': randomColor,
-  }" :is-fan-group="isFanGroup" :medal-level="medalLevel" :author-type="authorTypeText" :privilegeType="privilegeType"
-    :is-admin="authorType === 2" :is-owner="authorType === 3" :is-deleted="isDelete">
+  <yt-live-chat-text-message-renderer
+    :style="{'--repeated-text-color': randomColor,}"
+    :is-fan-group="isFanGroup"
+    :medal-level="medalLevel"
+    :author-type="authorTypeText"
+    :privilegeType="privilegeType"
+    :is-admin="authorType === 2"
+    :is-owner="authorType === 3"
+    :is-deleted="isDelete"
+    >
     <div id="card" class="style-scope yt-live-chat-text-message-renderer">
       <img-shadow id="author-photo" height="24" width="24" class="style-scope yt-live-chat-text-message-renderer"
         :imgUrl="avatarUrl"></img-shadow>
@@ -13,6 +19,11 @@
             authorName
           }}<!-- 这里是已验证勋章 -->
             <span id="chip-badges" class="style-scope yt-live-chat-author-chip"></span>
+          </span>
+          <span id="chat-medal" class="style-scope yt-live-chat-author-chip">
+            <author-medal class="style-scope yt-live-chat-author-chip"
+              :medalLevel="medalLevel" :medalName="medalName" :isFanGroup="isFanGroup"
+            ></author-medal>
           </span>
           <span id="chat-badges" class="style-scope yt-live-chat-author-chip">
             <author-badge class="style-scope yt-live-chat-author-chip" :isAdmin="authorType === 2"
@@ -43,6 +54,7 @@
 
 <script>
 import ImgShadow from './ImgShadow'
+import AuthorMedal from './AuthorMedal'
 import AuthorBadge from './AuthorBadge'
 import * as constants from './constants'
 import * as utils from '@/utils'
@@ -58,6 +70,7 @@ export default {
   name: 'TextMessage',
   components: {
     ImgShadow,
+    AuthorMedal,
     AuthorBadge
   },
   props: {
@@ -66,7 +79,9 @@ export default {
     authorName: String,
     authorType: Number,
     richContent: Array,
+    medalName: String,
     medalLevel: Number,
+    isFanGroup: Boolean,
     privilegeType: Number,
     repeated: Number,
     isFanGroup: Boolean,
