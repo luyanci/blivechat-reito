@@ -18,7 +18,9 @@
                 :authorType="message.authorType"
                 :privilegeType="message.privilegeType"
                 :richContent="getShowRichContent(message)"
+                :medalName="message.medalName"
                 :medalLevel="message.medalLevel"
+                :isFanGroup="message.isFanGroup"
                 :repeated="message.repeated"
               ></text-message>
               <paid-message :key="message.id" v-else-if="message.type === MESSAGE_TYPE_GIFT"

@@ -61,18 +61,19 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
 
   async danmuMsgCallback(command) {
     let info = command.info
-
     let modeInfo = info[0][15]
     let avatarUrl = modeInfo?.user?.base?.face ?? ''
     if (!avatarUrl) {
       avatarUrl = await chat.getAvatarUrl(uid, authorName)
     }
 
-    let roomId, medalLevel
+    let roomId, medalLevel, medalName
     if (info[3]) {
       roomId = info[3][3]
       medalLevel = info[3][0]
+      medalName = info[3][1]
     } else {
+      medalName = ''
       roomId = medalLevel = 0
     }
 
@@ -119,7 +120,9 @@ export default class ChatClientDirectWeb extends ChatClientOfficialBase {
       authorLevel: info[4][0],
       isNewbie: info[2][5] < 10000,
       isMobileVerified: Boolean(info[2][6]),
-      medalLevel: roomId === this.roomId ? medalLevel : 0,
+      medalName: medalName,
+      medalLevel: medalLevel,
+      isFanGroup: roomId === this.roomId ? true : false,  // 是否是粉丝团（即粉丝勋章为当前直播间的粉丝勋章）
       emoticon: info[0][13].url || null,
     })
     this.msgHandler.onAddText(data)

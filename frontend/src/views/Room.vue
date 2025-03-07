@@ -277,6 +277,9 @@ export default {
         content: data.content,
         richContent: richContent,
         privilegeType: data.privilegeType,
+        medalName: data.medalName,
+        medalLevel: data.medalLevel,
+        isFanGroup: data.isFanGroup,
         repeated: 1,
         translation: data.translation
       }

@@ -14,7 +14,9 @@ export class AddTextMsg {
     authorLevel = 1,
     isNewbie = false,
     isMobileVerified = true,
+    medalName = '',
     medalLevel = 0,
+    isFanGroup = false,
     id = getUuid4Hex(),
     translation = '',
     emoticon = null,
@@ -29,7 +31,9 @@ export class AddTextMsg {
     this.authorLevel = authorLevel
     this.isNewbie = isNewbie
     this.isMobileVerified = isMobileVerified
+    this.medalName = medalName
     this.medalLevel = medalLevel
+    this.isFanGroup = isFanGroup
     this.id = id
     this.translation = translation
     this.emoticon = emoticon
@@ -46,6 +50,9 @@ export class AddGiftMsg {
     totalFreeCoin = 0,
     giftName = '',
     num = 1,
+    medalName = '',
+    medalLevel = 0,
+    isFanGroup = false,
   } = {}) {
     this.id = id
     this.avatarUrl = avatarUrl
@@ -55,6 +62,9 @@ export class AddGiftMsg {
     this.totalFreeCoin = totalFreeCoin
     this.giftName = giftName
     this.num = num
+    this.medalName = medalName
+    this.medalLevel = medalLevel
+    this.isFanGroup = isFanGroup
   }
 }
 
@@ -65,12 +75,22 @@ export class AddMemberMsg {
     timestamp = new Date().getTime() / 1000,
     authorName = '',
     privilegeType = 1,
+    guardNum = 0,
+    guardUnit = '',
+    medalName = '',
+    medalLevel = 0,
+    isFanGroup = false,
   } = {}) {
     this.id = id
     this.avatarUrl = avatarUrl
     this.timestamp = timestamp
     this.authorName = authorName
     this.privilegeType = privilegeType
+    this.guardNum = guardNum
+    this.guardUnit = guardUnit
+    this.medalName = medalName
+    this.medalLevel = medalLevel
+    this.isFanGroup = isFanGroup
   }
 }
 
@@ -83,6 +103,9 @@ export class AddSuperChatMsg {
     price = 0,
     content = '',
     translation = '',
+    medalName = '',
+    medalLevel = 0,
+    isFanGroup = false,
   } = {}) {
     this.id = id
     this.avatarUrl = avatarUrl
@@ -91,6 +114,9 @@ export class AddSuperChatMsg {
     this.price = price
     this.content = content
     this.translation = translation
+    this.medalName = medalName
+    this.medalLevel = medalLevel
+    this.isFanGroup = isFanGroup
   }
 }
 
