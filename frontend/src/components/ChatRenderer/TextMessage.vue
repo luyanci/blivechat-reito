@@ -83,9 +83,7 @@ export default {
     medalLevel: Number,
     isFanGroup: Boolean,
     privilegeType: Number,
-    repeated: Number,
-    isFanGroup: Boolean,
-    isDelete: Boolean
+    repeated: Number
   },
   data() {
     return {
